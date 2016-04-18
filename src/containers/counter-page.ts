@@ -5,6 +5,12 @@ import * as CounterActions from '../actions/counter';
 import { RioContainer, RioCounter } from '../components';
 import {NgRedux} from 'ng2-redux';
 
+declare interface IAppState {
+  counter: Map<string, number>;
+  session: Map<string, any>;
+}
+
+
 @Component({
   selector: 'counter-page',
   directives: [RioContainer, RioCounter],
@@ -29,7 +35,7 @@ export class RioCounterPage {
   private unsubscribe: Function;
   private counter$: any;
   constructor(
-    private ngRedux:NgRedux<any>
+    private ngRedux: NgRedux<IAppState>
     ) {}
 
   ngOnInit() {
