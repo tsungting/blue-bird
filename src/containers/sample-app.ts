@@ -4,7 +4,7 @@ import {
   Inject,
   ApplicationRef
 } from 'angular2/core';
-
+import {Observable, Subscriber, Subscription} from 'rxjs';
 import { RouteConfig, ROUTER_DIRECTIVES } from 'angular2/router';
 import { bindActionCreators } from 'redux';
 
@@ -21,6 +21,9 @@ import {
   RioLogo,
   RioLoginModal
 } from '../components';
+
+import {IAppState} from './app-state';
+import {NgRedux} from 'ng2-redux';
 
 @Component({
   selector: 'rio-sample-app',
@@ -86,34 +89,31 @@ export class RioSampleApp {
   private unsubscribe: Function;
   private isLoggedIn: Boolean;
   private session: any;
-
+  private selector: Subscription;
+  
+  
   constructor(
-    @Inject('ngRedux') private ngRedux,
+    private ngRedux: NgRedux<IAppState>,
     private applicationRef: ApplicationRef) {
   }
 
   ngOnInit() {
-    this.disconnect = this.ngRedux.connect(
-      this.mapStateToThis,
-      this.mapDispatchToThis)(this);
-
-    this.unsubscribe = this.ngRedux.subscribe(() => {
-      this.applicationRef.tick();
-    });
+    this.selector = this.ngRedux
+      .select(state => ({
+        session: state.session,
+        isLoggedIn: state.session.get('token', false)
+      }))
+      .subscribe(n => { 
+        Object.assign(this, n);
+      });
+  
+    this.ngRedux.mapDispatchToTarget(this.mapDispatchToThis)(this);
+    
   }
 
   ngOnDestroy() {
-    this.unsubscribe();
-    this.disconnect();
+    this.selector.unsubscribe();
   }
-
-  mapStateToThis(state) {
-    return {
-      session: state.session,
-      isLoggedIn: state.session.get('token', false)
-    };
-  }
-
   mapDispatchToThis(dispatch) {
     return {
       login: (credentials) => dispatch(loginUser(credentials)),
