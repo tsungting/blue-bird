@@ -21,7 +21,6 @@ if (__PRODUCTION__) {
 
 bootstrap(RioSampleApp, [
   provider(store),
-  NgRedux,
   ROUTER_PROVIDERS,
   provide(APP_BASE_HREF, { useValue: '/' })
 ]);
