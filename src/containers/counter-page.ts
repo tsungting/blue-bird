@@ -1,15 +1,10 @@
 import { Component, Inject, ApplicationRef } from 'angular2/core';
 import { bindActionCreators } from 'redux';
 import { AsyncPipe } from 'angular2/common';
-import * as CounterActions from '../actions/counter';
+import { NgRedux } from 'ng2-redux';
+import { CounterActions } from '../actions/counter';
 import { RioContainer, RioCounter } from '../components';
-import {NgRedux} from 'ng2-redux';
-
-declare interface IAppState {
-  counter: Map<string, number>;
-  session: Map<string, any>;
-}
-
+import { IAppState } from './app-state';
 
 @Component({
   selector: 'counter-page',
@@ -31,24 +26,19 @@ declare interface IAppState {
   `
 })
 export class RioCounterPage {
-  private disconnect: Function;
-  private unsubscribe: Function;
   private counter$: any;
+
   constructor(
-    private ngRedux: NgRedux<IAppState>
-    ) {}
+    private ngRedux: NgRedux<IAppState>,
+    private counterActions: CounterActions) {}
 
   ngOnInit() {
     this.counter$ = this.ngRedux
       .select(n => n.counter.get('count'));
-      
-    this.ngRedux.mapDispatchToTarget(CounterActions)(this);
-    
-  }
-  
-  ngOnDestroy() {
-    
-  }
 
-  
+    this.ngRedux.mapDispatchToTarget({
+      increment: this.counterActions.increment,
+      decrement: this.counterActions.decrement
+    })(this);
+  }
 }

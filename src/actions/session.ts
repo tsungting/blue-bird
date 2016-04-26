@@ -1,4 +1,5 @@
-import { login } from '../api/login';
+import { Injectable } from 'angular2/core';
+import { LoginService } from '../services/login';
 
 import {
   LOGIN_USER_PENDING,
@@ -7,26 +8,31 @@ import {
   LOGOUT_USER
 } from '../constants';
 
-export function loginUser(credentials) {
-  return (dispatch, getState) => {
-    const username = credentials.username;
-    const password = credentials.password;
+@Injectable()
+export class SessionActions {
+  constructor(private loginService: LoginService) {}
 
-    return dispatch({
-      types: [
-        LOGIN_USER_PENDING,
-        LOGIN_USER_SUCCESS,
-        LOGIN_USER_ERROR,
-      ],
-      payload: {
-        promise: login(username, password)
-      },
-    });
-  };
-}
+  loginUser = (credentials) => {
+    return (dispatch, getState) => {
+      const username = credentials.username;
+      const password = credentials.password;
 
-export function logoutUser() {
-  return {
-    type: LOGOUT_USER,
+      return dispatch({
+        types: [
+          LOGIN_USER_PENDING,
+          LOGIN_USER_SUCCESS,
+          LOGIN_USER_ERROR,
+        ],
+        payload: {
+          promise: this.loginService.login(username, password)
+        },
+      });
+    };
   };
-}
+
+  logoutUser = () => {
+    return {
+      type: LOGOUT_USER,
+    };
+  };
+} 

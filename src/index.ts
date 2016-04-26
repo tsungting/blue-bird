@@ -8,9 +8,13 @@ import 'angular2/bundles/angular2-polyfills';
 import { enableProdMode, provide } from 'angular2/core';
 import { bootstrap } from 'angular2/platform/browser';
 import { ROUTER_PROVIDERS, APP_BASE_HREF } from 'angular2/router';
+import { provider, NgRedux } from 'ng2-redux';
+
 import configureStore from './store/configure-store';
 import { RioSampleApp } from './containers/sample-app';
-import { provider, NgRedux } from 'ng2-redux';
+import { SessionActions } from './actions/session';
+import { CounterActions } from './actions/counter';
+import { LoginService } from './services/login';
 
 const store = configureStore({});
 declare let __PRODUCTION__: any;
@@ -21,6 +25,9 @@ if (__PRODUCTION__) {
 
 bootstrap(RioSampleApp, [
   provider(store),
+  SessionActions,
+  CounterActions,
+  LoginService,
   ROUTER_PROVIDERS,
   provide(APP_BASE_HREF, { useValue: '/' })
 ]);
