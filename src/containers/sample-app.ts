@@ -5,8 +5,9 @@ import {
   ApplicationRef
 } from 'angular2/core';
 
-import { Observable } from 'rxjs';
 import { RouteConfig, ROUTER_DIRECTIVES } from 'angular2/router';
+import { AsyncPipe } from 'angular2/common';
+import { Observable } from 'rxjs';
 import { bindActionCreators } from 'redux';
 import { Map } from 'immutable';
 
@@ -31,6 +32,7 @@ import {NgRedux} from 'ng2-redux';
     ROUTER_DIRECTIVES, RioNavigator, RioNavigatorItem,
     RioLoginModal, RioLogo, RioButton
   ],
+  pipes: [ AsyncPipe ],
   // Global styles imported in the app component.
   encapsulation: ViewEncapsulation.None,
   styles: [require('../styles/index.css')],
@@ -106,6 +108,7 @@ export class RioSampleApp {
     this.isLoading$ = session$.map(s => !!s.get('isLoading'));
     this.loggedIn$ = session$.map(s => !!s.get('token'));
     this.loggedOut$ = this.loggedIn$.map(loggedIn => !loggedIn);
+
     this.userName$ = session$.map(s => {
         return [
           s.getIn(['user', 'firstName'], ''),
