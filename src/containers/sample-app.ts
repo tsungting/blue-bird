@@ -93,16 +93,15 @@ export class RioSampleApp {
   private loggedIn$: Observable<boolean>;
   private loggedOut$: Observable<boolean>;
   private userName$: Observable<string>;
+  private unsubscribe: () => void;
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
-    private applicationRef: ApplicationRef,
+    ngRedux: NgRedux<IAppState>,
+    applicationRef: ApplicationRef,
     private sessionActions: SessionActions) {
-  }
 
-  ngOnInit() {
     const session$: Observable<Map<string, any>>
-      = this.ngRedux.select('session');
+      = ngRedux.select('session');
 
     this.hasError$ = session$.map(s => !!s.get('hasError'));
     this.isLoading$ = session$.map(s => !!s.get('isLoading'));
@@ -116,7 +115,14 @@ export class RioSampleApp {
          ].join(' ');
       });
 
-    this.ngRedux.mapDispatchToTarget(this.mapDispatchToThis)(this);
+    ngRedux.mapDispatchToTarget(this.mapDispatchToThis)(this);
+    this.unsubscribe = ngRedux.subscribe(() => {
+      applicationRef.tick();
+    });
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe();
   }
 
   mapDispatchToThis = (dispatch) => {
