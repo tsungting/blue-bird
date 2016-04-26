@@ -3,15 +3,15 @@ import { INCREMENT_COUNTER, DECREMENT_COUNTER } from '../constants';
 
 @Injectable()
 export class CounterActions {
-  increment = () => {
+  increment() {
     return {
       type: INCREMENT_COUNTER
     };
-  };
+  }
 
-  decrement = () => {
+  decrement() {
     return {
       type: DECREMENT_COUNTER
     };
-  };
+  }
 }

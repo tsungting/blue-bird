@@ -12,7 +12,7 @@ import {
 export class SessionActions {
   constructor(private loginService: LoginService) {}
 
-  loginUser = (credentials) => {
+  loginUser(credentials) {
     return (dispatch, getState) => {
       const username = credentials.username;
       const password = credentials.password;
@@ -28,11 +28,11 @@ export class SessionActions {
         },
       });
     };
-  };
+  }
 
-  logoutUser = () => {
+  logoutUser() {
     return {
       type: LOGOUT_USER,
     };
-  };
+  }
 } 

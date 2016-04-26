@@ -1,14 +1,12 @@
 import {
   Component,
   ViewEncapsulation,
-  Inject,
   ApplicationRef
 } from 'angular2/core';
 
 import { RouteConfig, ROUTER_DIRECTIVES } from 'angular2/router';
 import { AsyncPipe } from 'angular2/common';
 import { Observable } from 'rxjs';
-import { bindActionCreators } from 'redux';
 import { Map } from 'immutable';
 
 import { SessionActions } from '../actions/session';
@@ -96,7 +94,7 @@ export class RioSampleApp {
   private unsubscribe: () => void;
 
   constructor(
-    ngRedux: NgRedux<IAppState>,
+    private ngRedux: NgRedux<IAppState>,
     applicationRef: ApplicationRef,
     private sessionActions: SessionActions) {
 
@@ -115,7 +113,15 @@ export class RioSampleApp {
          ].join(' ');
       });
 
-    ngRedux.mapDispatchToTarget(this.mapDispatchToThis)(this);
+    ngRedux.mapDispatchToTarget((dispatch) => {
+      return {
+        login: (credentials) => dispatch(
+          this.sessionActions.loginUser(credentials)),
+        logout: () => dispatch(
+          this.sessionActions.logoutUser())
+      };
+    })(this);
+
     this.unsubscribe = ngRedux.subscribe(() => {
       applicationRef.tick();
     });
@@ -124,13 +130,4 @@ export class RioSampleApp {
   ngOnDestroy() {
     this.unsubscribe();
   }
-
-  mapDispatchToThis = (dispatch) => {
-    const { loginUser, logoutUser } = this.sessionActions;
-
-    return {
-      login: (credentials) => dispatch(loginUser(credentials)),
-      logout: () => dispatch(logoutUser())
-    };
-  };
 };
