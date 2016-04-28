@@ -1,16 +1,12 @@
-import {
-  Component,
-  ViewEncapsulation,
-  Inject,
-  ApplicationRef
-} from 'angular2/core';
-
+import { Component, ViewEncapsulation, ApplicationRef } from 'angular2/core';
 import { RouteConfig, ROUTER_DIRECTIVES } from 'angular2/router';
-import { bindActionCreators } from 'redux';
+import { AsyncPipe } from 'angular2/common';
+import { Observable } from 'rxjs';
+import { Map } from 'immutable';
+import { NgRedux } from 'ng2-redux';
 
-import * as SessionActions from '../actions/session';
-import {loginUser, logoutUser} from '../actions/session';
-
+import { IAppState } from '../store/app-state';
+import { SessionActions } from '../actions/session';
 import { RioAboutPage } from './about-page';
 import { RioCounterPage } from './counter-page';
 
@@ -22,51 +18,18 @@ import {
   RioLoginModal
 } from '../components';
 
+
 @Component({
   selector: 'rio-sample-app',
   directives: [
     ROUTER_DIRECTIVES, RioNavigator, RioNavigatorItem,
     RioLoginModal, RioLogo, RioButton
   ],
-  // Global styles imported in the app component.
+  pipes: [ AsyncPipe ],
+  // Allow app to define global styles.
   encapsulation: ViewEncapsulation.None,
-  styles: [require('../styles/index.css')],
-  template: `
-    <div>
-      <rio-login-modal
-        (onSubmit)="login($event)"
-        [hasError]="session.get('hasError', false)"
-        [isPending]="session.get('isLoading', false)"
-        *ngIf="!isLoggedIn"></rio-login-modal>
-      <rio-navigator>
-        <rio-navigator-item [mr]=true>
-          <rio-logo></rio-logo>
-        </rio-navigator-item>
-        <rio-navigator-item *ngIf="isLoggedIn" [mr]=true>
-          <a [routerLink]="['Counter']"
-            class="text-decoration-none">Counter</a>
-        </rio-navigator-item>
-        <rio-navigator-item *ngIf="isLoggedIn">
-          <a [routerLink]="['About']"
-            class="text-decoration-none">About Us</a>
-        </rio-navigator-item>
-        <div class="flex flex-auto"></div>
-        <rio-navigator-item *ngIf="isLoggedIn" [mr]=true>
-          {{
-            session.getIn(['user', 'firstName'], '') + ' ' +
-            session.getIn(['user', 'lastName'], '') }}
-        </rio-navigator-item>
-        <rio-navigator-item [hidden]="!isLoggedIn">
-          <rio-button className="bg-red white" (click)="logout()" >
-            Logout
-          </rio-button>
-        </rio-navigator-item>
-      </rio-navigator>
-      <main>
-        <router-outlet *ngIf="isLoggedIn"></router-outlet>
-      </main>
-    </div>
-  `
+  styles: [ require('../styles/index.css') ],
+  template: require('./sample-app.tmpl.html')
 })
 @RouteConfig([
   {
@@ -82,42 +45,48 @@ import {
   }
 ])
 export class RioSampleApp {
-  private disconnect: Function;
-  private unsubscribe: Function;
-  private isLoggedIn: Boolean;
-  private session: any;
+  private hasError$: Observable<boolean>;
+  private isLoading$: Observable<boolean>;
+  private loggedIn$: Observable<boolean>;
+  private loggedOut$: Observable<boolean>;
+  private userName$: Observable<string>;
+  private unsubscribe: () => void;
 
   constructor(
-    @Inject('ngRedux') private ngRedux,
-    private applicationRef: ApplicationRef) {
-  }
+    private ngRedux: NgRedux<IAppState>,
+    applicationRef: ApplicationRef,
+    private sessionActions: SessionActions) {
 
-  ngOnInit() {
-    this.disconnect = this.ngRedux.connect(
-      this.mapStateToThis,
-      this.mapDispatchToThis)(this);
+    const session$: Observable<Map<string, any>>
+      = ngRedux.select('session');
 
-    this.unsubscribe = this.ngRedux.subscribe(() => {
-      this.applicationRef.tick();
+    this.hasError$ = session$.map(s => !!s.get('hasError'));
+    this.isLoading$ = session$.map(s => !!s.get('isLoading'));
+    this.loggedIn$ = session$.map(s => !!s.get('token'));
+    this.loggedOut$ = this.loggedIn$.map(loggedIn => !loggedIn);
+
+    this.userName$ = session$.map(s => {
+        return [
+          s.getIn(['user', 'firstName'], ''),
+          s.getIn(['user', 'lastName'], '')
+         ].join(' ');
+      });
+
+    ngRedux.mapDispatchToTarget((dispatch) => {
+      return {
+        login: (credentials) => dispatch(
+          this.sessionActions.loginUser(credentials)),
+        logout: () => dispatch(
+          this.sessionActions.logoutUser())
+      };
+    })(this);
+
+    this.unsubscribe = ngRedux.subscribe(() => {
+      applicationRef.tick();
     });
   }
 
   ngOnDestroy() {
     this.unsubscribe();
-    this.disconnect();
-  }
-
-  mapStateToThis(state) {
-    return {
-      session: state.session,
-      isLoggedIn: state.session.get('token', false)
-    };
-  }
-
-  mapDispatchToThis(dispatch) {
-    return {
-      login: (credentials) => dispatch(loginUser(credentials)),
-      logout: () => dispatch(logoutUser())
-    };
   }
 };

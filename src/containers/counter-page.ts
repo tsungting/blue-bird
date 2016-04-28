@@ -1,12 +1,17 @@
 import { Component, Inject, ApplicationRef } from 'angular2/core';
 import { bindActionCreators } from 'redux';
+import { AsyncPipe } from 'angular2/common';
+import { NgRedux } from 'ng2-redux';
+import { Observable } from 'rxjs';
 
-import * as CounterActions from '../actions/counter';
+import { CounterActions } from '../actions/counter';
 import { RioContainer, RioCounter } from '../components';
+import { IAppState } from '../store/app-state';
 
 @Component({
   selector: 'counter-page',
-  directives: [ RioContainer, RioCounter ],
+  directives: [RioContainer, RioCounter],
+  pipes: [AsyncPipe],
   template: `
     <rio-container [size]=2 [center]=true>
       <h2 id="qa-counter-heading"
@@ -15,7 +20,7 @@ import { RioContainer, RioCounter } from '../components';
       </h2>
 
       <rio-counter
-        [counter]="counter"
+        [counter]="counter$ | async"
         [increment]="increment"
         [decrement]="decrement">
       </rio-counter>
@@ -23,35 +28,20 @@ import { RioContainer, RioCounter } from '../components';
   `
 })
 export class RioCounterPage {
-  private disconnect: Function;
-  private unsubscribe: Function;
+  private counter$: Observable<number>;
 
   constructor(
-    @Inject('ngRedux') private ngRedux,
-    private applicationRef: ApplicationRef) {}
+    private ngRedux: NgRedux<IAppState>,
+    private counterActions: CounterActions) {
 
-  ngOnInit() {
-    this.disconnect = this.ngRedux.connect(
-      this.mapStateToThis,
-      this.mapDispatchToThis)(this);
-
-    this.unsubscribe = this.ngRedux.subscribe(() => {
-      this.applicationRef.tick();
-    });
+    this.counter$ = this.ngRedux.select(n => n.counter.get('count'));
   }
 
-  ngOnDestroy() {
-    this.unsubscribe();
-    this.disconnect();
-  }
+  private increment = () => {
+    this.ngRedux.dispatch(this.counterActions.increment());
+  };
 
-  mapStateToThis(state) {
-    return {
-      counter: state.counter.get('count')
-    };
-  }
-
-  mapDispatchToThis(dispatch) {
-    return bindActionCreators(CounterActions, dispatch);
-  }
+  private decrement = () => {
+    this.ngRedux.dispatch(this.counterActions.decrement());
+  };
 }
