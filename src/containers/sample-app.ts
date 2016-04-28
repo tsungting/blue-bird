@@ -1,14 +1,11 @@
-import {
-  Component,
-  ViewEncapsulation,
-  ApplicationRef
-} from 'angular2/core';
-
+import { Component, ViewEncapsulation, ApplicationRef } from 'angular2/core';
 import { RouteConfig, ROUTER_DIRECTIVES } from 'angular2/router';
 import { AsyncPipe } from 'angular2/common';
 import { Observable } from 'rxjs';
 import { Map } from 'immutable';
+import { NgRedux } from 'ng2-redux';
 
+import { IAppState } from '../store/app-state';
 import { SessionActions } from '../actions/session';
 import { RioAboutPage } from './about-page';
 import { RioCounterPage } from './counter-page';
@@ -21,8 +18,6 @@ import {
   RioLoginModal
 } from '../components';
 
-import {IAppState} from './app-state';
-import {NgRedux} from 'ng2-redux';
 
 @Component({
   selector: 'rio-sample-app',
@@ -31,46 +26,10 @@ import {NgRedux} from 'ng2-redux';
     RioLoginModal, RioLogo, RioButton
   ],
   pipes: [ AsyncPipe ],
-  // Global styles imported in the app component.
+  // Allow app to define global styles.
   encapsulation: ViewEncapsulation.None,
-  styles: [require('../styles/index.css')],
-  template: `
-    <div>
-      <rio-login-modal
-        (onSubmit)="login($event)"
-        [hasError]="hasError$ | async"
-        [isPending]="isLoading$ | async"
-        *ngIf="loggedOut$ | async">
-      </rio-login-modal>
-      <rio-navigator>
-        <rio-navigator-item [mr]=true>
-          <rio-logo></rio-logo>
-        </rio-navigator-item>
-        <rio-navigator-item *ngIf="loggedIn$ | async" [mr]=true>
-          <a [routerLink]="['Counter']"
-            class="text-decoration-none">Counter</a>
-        </rio-navigator-item>
-        <rio-navigator-item *ngIf="loggedIn$ | async">
-          <a [routerLink]="['About']"
-            class="text-decoration-none">About Us</a>
-        </rio-navigator-item>
-
-        <div class="flex flex-auto"></div>
-
-        <rio-navigator-item *ngIf="loggedIn$ | async" [mr]=true>
-          {{ userName$ | async }}
-        </rio-navigator-item>
-        <rio-navigator-item [hidden]="loggedOut$ | async">
-          <rio-button className="bg-red white" (click)="logout()" >
-            Logout
-          </rio-button>
-        </rio-navigator-item>
-      </rio-navigator>
-      <main>
-        <router-outlet *ngIf="loggedIn$ | async"></router-outlet>
-      </main>
-    </div>
-  `
+  styles: [ require('../styles/index.css') ],
+  template: require('./sample-app.tmpl.html')
 })
 @RouteConfig([
   {
