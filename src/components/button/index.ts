@@ -17,7 +17,7 @@ export class RioButton {
   @Input() className: string;
   @Input() type: string;
   @Input() qaid: string;
-  @Output() onClick: EventEmitter<Event> = new EventEmitter();
+  @Output() onClick = new EventEmitter<Event>();
 
   handleClick(event) {
     this.onClick.emit(event);
