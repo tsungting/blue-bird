@@ -58,7 +58,7 @@ export class RioSampleApp {
     private sessionActions: SessionActions) {
 
     const session$: Observable<Map<string, any>>
-      = ngRedux.select('session');
+      = ngRedux.select<Map<string, any>>('session');
 
     this.hasError$ = session$.map(s => !!s.get('hasError'));
     this.isLoading$ = session$.map(s => !!s.get('isLoading'));

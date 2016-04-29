@@ -43,7 +43,7 @@
     "winston": "^2.1.1"
   },
   "devDependencies": {
-    "angular2": "2.0.0-beta.15",
+    "angular2": "2.0.0-beta.17",
     "autoprefixer": "^6.3.3",
     "autoprefixer-core": "^6.0.1",
     "basscss": "^8.0.1",
@@ -101,7 +101,7 @@
     "reflect-metadata": "0.1.2",
     "remap-istanbul": "^0.6.1",
     "rimraf": "^2.5.1",
-    "rxjs": "5.0.0-beta.2",
+    "rxjs": "5.0.0-beta.6",
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0",
     "style-loader": "^0.13.0",
@@ -111,7 +111,7 @@
     "ts-loader": "^0.8.0",
     "tslint": "^3.3.0",
     "tslint-loader": "^2.1.0",
-    "typescript": "^1.8.6",
+    "typescript": "^1.8.10",
     "typings": "^0.8.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.0",

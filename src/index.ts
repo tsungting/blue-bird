@@ -7,7 +7,8 @@ import 'angular2/bundles/angular2-polyfills';
 
 import { enableProdMode, provide } from 'angular2/core';
 import { bootstrap } from 'angular2/platform/browser';
-import { ROUTER_PROVIDERS, APP_BASE_HREF } from 'angular2/router';
+import { ROUTER_PROVIDERS } from 'angular2/router';
+import { APP_BASE_HREF } from 'angular2/platform/common';
 import { provider, NgRedux } from 'ng2-redux';
 
 import configureStore from './store/configure-store';
