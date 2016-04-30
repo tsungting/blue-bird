@@ -2,7 +2,7 @@ import { Component, Inject, ApplicationRef } from 'angular2/core';
 import { bindActionCreators } from 'redux';
 import { AsyncPipe } from 'angular2/common';
 import { NgRedux } from 'ng2-redux';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 
 import { CounterActions } from '../actions/counter';
 import { RioContainer, RioCounter } from '../components';

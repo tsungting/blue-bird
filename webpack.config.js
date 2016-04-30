@@ -37,9 +37,7 @@ const prodPlugins = [
   new webpack.optimize.OccurenceOrderPlugin(),
   new webpack.optimize.DedupePlugin(),
   new webpack.optimize.UglifyJsPlugin({
-    mangle: {
-       keep_fnames: true
-    },
+    mangle: true,
     compress: {
       warnings: false
     }
@@ -73,7 +71,7 @@ const postcssPlugins = postcssBasePlugins
 
 module.exports = {
   entry: {
-    app: './src/index.ts',
+    app: './src/index.ts'
   },
 
   output: {
