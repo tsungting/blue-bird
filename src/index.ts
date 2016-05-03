@@ -4,6 +4,7 @@ import 'es6-promise';
 import '../shims/shims_for_IE';
 
 import 'angular2/bundles/angular2-polyfills';
+import 'ts-helpers';
 
 import { enableProdMode, provide } from 'angular2/core';
 import { bootstrap } from 'angular2/platform/browser';
