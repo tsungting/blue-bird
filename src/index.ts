@@ -21,8 +21,7 @@ declare let __PRODUCTION__: any;
 
 if (__PRODUCTION__) {
   enableProdMode();
-}
-else {
+} else {
   require('zone.js/dist/long-stack-trace-zone');
 }
 
