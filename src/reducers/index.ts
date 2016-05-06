@@ -1,9 +1,13 @@
 import { combineReducers } from 'redux';
-import counter from './counter';
-import session from './session';
-import { IAppState } from '../store';
+import { ICounter, counterReducer } from './counter';
+import { ISession, sessionReducer } from './session';
+
+export interface IAppState {
+  counter?: ICounter;
+  session?: ISession;
+};
 
 export default combineReducers<IAppState>({
-  counter,
-  session
+  counter: counterReducer,
+  session: sessionReducer
 });

@@ -3,14 +3,19 @@ import {
   DECREMENT_COUNTER,
   LOGOUT_USER
 } from '../constants';
-import { fromJS } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 
 const INITIAL_STATE = fromJS({
   count: 0,
 });
 
-function counterReducer(state = INITIAL_STATE, action = { type: '' }) {
+export type ICounter = Map<string, number>;
+
+export function counterReducer(
+  state: ICounter = INITIAL_STATE,
+  action = { type: '' }) {
+
   switch (action.type) {
 
   case INCREMENT_COUNTER:
@@ -26,6 +31,3 @@ function counterReducer(state = INITIAL_STATE, action = { type: '' }) {
     return state;
   }
 }
-
-
-export default counterReducer;

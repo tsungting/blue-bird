@@ -5,7 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import { Map } from 'immutable';
 import { NgRedux, select, dispatch } from 'ng2-redux';
 
-import { IAppState } from '../store';
+import { IAppState } from '../reducers';
+import { ISession } from '../reducers/session';
 import { SessionActions } from '../actions/session';
 import { RioAboutPage } from './about-page';
 import { RioCounterPage } from './counter-page';
@@ -46,7 +47,7 @@ import {
   }
 ])
 export class RioSampleApp {
-  @select() session$: Observable<Map<string, any>>;
+  @select() session$: Observable<ISession>;
 
   hasError$: Observable<boolean>;
   isLoading$: Observable<boolean>;

@@ -25,11 +25,6 @@ const baseEnhancers = [
   })
 ];
 
-export interface IAppState {
-  counter?: Map<string, number>;
-  session?: Map<string, any>;
-};
-
 export const middleware = __DEV__ ?
   [ ...baseMiddleware, logger ] :
   baseMiddleware;

@@ -5,7 +5,7 @@ import {
   LOGOUT_USER,
 } from '../constants';
 
-import { fromJS } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 const INITIAL_STATE = fromJS({
   token: null,
@@ -14,7 +14,12 @@ const INITIAL_STATE = fromJS({
   isLoading: false,
 });
 
-function sessionReducer(state = INITIAL_STATE, action: any = {type: ''}) {
+export type ISession = Map<string, any>;
+
+export function sessionReducer(
+  state: ISession = INITIAL_STATE,
+  action: any = {type: ''}) {
+
   switch (action.type) {
 
   case LOGIN_USER_PENDING:
@@ -46,5 +51,3 @@ function sessionReducer(state = INITIAL_STATE, action: any = {type: ''}) {
     return state;
   }
 }
-
-export default sessionReducer;
