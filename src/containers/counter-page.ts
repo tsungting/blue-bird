@@ -1,12 +1,10 @@
 import { Component, Inject, ApplicationRef } from '@angular/core';
-import { bindActionCreators } from 'redux';
 import { AsyncPipe } from '@angular/common';
-import { NgRedux } from 'ng2-redux';
+import { bindActionCreators } from 'redux';
+import { select, dispatchAll } from 'ng2-redux';
+import * as counterActions from '../actions/counter';
 import { Observable } from 'rxjs/Observable';
-
-import { CounterActions } from '../actions/counter';
 import { RioContainer, RioCounter } from '../components';
-import { IAppState } from '../store/app-state';
 
 @Component({
   selector: 'counter-page',
@@ -27,21 +25,7 @@ import { IAppState } from '../store/app-state';
     </rio-container>
   `
 })
+@dispatchAll(counterActions)
 export class RioCounterPage {
-  private counter$: Observable<number>;
-
-  constructor(
-    private ngRedux: NgRedux<IAppState>,
-    private counterActions: CounterActions) {
-
-    this.counter$ = this.ngRedux.select(n => n.counter.get('count'));
-  }
-
-  private increment = () => {
-    this.ngRedux.dispatch(this.counterActions.increment());
-  };
-
-  private decrement = () => {
-    this.ngRedux.dispatch(this.counterActions.decrement());
-  };
+  @select(n => n.counter.get('count')) private counter$: Observable<number>;
 }
