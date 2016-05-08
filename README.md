@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/rangle/angular2-redux-starter.svg?style=svg)](https://circleci.com/gh/rangle/angular2-redux-starter)
+
 # Angular 2/TypeScript/Redux/Webpack Starter
 
 This is the initial version of our starter project using Angular 2.x, Redux, TypeScript and Webpack to tie it all together.
