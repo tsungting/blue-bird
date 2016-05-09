@@ -23,6 +23,7 @@ const basePlugins = [
     inject: 'body',
     minify: false,
   }),
+  new webpack.NoErrorsPlugin(),
 ];
 
 const devPlugins = [
