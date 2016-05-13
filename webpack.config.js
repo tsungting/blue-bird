@@ -95,7 +95,7 @@ module.exports = {
 
   devServer: {
     historyApiFallback: { index: '/' },
-    proxy: proxy(),
+    proxy: Object.assign({}, proxy(), { '*': 'http://localhost:3000' }),
   },
 
   module: {

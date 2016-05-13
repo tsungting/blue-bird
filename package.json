@@ -9,7 +9,7 @@
     "typescript"
   ],
   "engines": {
-    "node": "4.x"
+    "node": "4.4.4"
   },
   "scripts": {
     "prebuild": "npm run clean",
@@ -17,7 +17,9 @@
     "clean": "rimraf dist/",
     "cover": "remap-istanbul -i coverage/chrome/coverage-final.json -o coverage/coverage.json",
     "postcover": "istanbul report lcov text-summary",
-    "dev": "cross-env NODE_ENV=development webpack-dev-server -d --inline --progress --no-info",
+    "dev:server": "cross-env NODE_ENV=development PORT=3000 nodemon server/node-server.js",
+    "dev:client": "cross-env NODE_ENV=development webpack-dev-server -d --inline --progress --no-info",
+    "dev": "concurrently 'npm run dev:client' 'npm run dev:server'",
     "lint": "npm run lint-ts && npm run lint-js && npm run lint-css",
     "lint-css": "stylelint './src/**/*.css'",
     "lint-ts": "tslint './src/**/*.ts'",
@@ -69,6 +71,7 @@
     "basscss-typography": "^3.0.3",
     "body-parser": "^1.15.0",
     "classlist-polyfill": "^1.0.2",
+    "concurrently": "^2.0.0",
     "console-polyfill": "^0.2.2",
     "core-js": "^2.3.0",
     "cross-env": "^1.0.7",
@@ -88,14 +91,15 @@
     "jasmine-core": "^2.4.1",
     "karma": "^0.13.22",
     "karma-chrome-launcher": "^1.0.1",
+    "karma-coverage": "^1.0.0",
     "karma-jasmine": "^0.3.8",
     "karma-phantomjs-launcher": "^1.0.0",
-    "karma-coverage": "^1.0.0",
     "karma-source-map-support": "^1.1.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.26",
     "karma-webpack": "^1.7.0",
     "ng2-redux": "^2.3.1",
+    "nodemon": "^1.9.2",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "phantomjs-polyfill": "0.0.2",
