@@ -1,7 +1,6 @@
 import { Injectable, provide } from '@angular/core';
 import { ServerService } from '../server/';
 
-
 @Injectable()
 export class AuthService {
 
@@ -21,8 +20,3 @@ export class AuthService {
     });
   }
 }
-
-export var AUTH_PROVIDERS: Array<any> = [
-  provide(AuthService, {useClass: AuthService})
-];
-

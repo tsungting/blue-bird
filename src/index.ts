@@ -15,8 +15,8 @@ import { NgRedux } from 'ng2-redux';
 import { RioSampleApp } from './containers/sample-app';
 import { SessionActions } from './actions/session';
 import { CounterActions } from './actions/counter';
-import { AUTH_PROVIDERS } from './services/auth/';
-import { SERVER_PROVIDERS } from './services/server/';
+import { AuthService } from './services/auth/';
+import { ServerService } from './services/server/';
 
 declare let __PRODUCTION__: any;
 
@@ -30,8 +30,8 @@ bootstrap(RioSampleApp, [
   NgRedux,
   SessionActions,
   CounterActions,
-  AUTH_PROVIDERS,
-  SERVER_PROVIDERS,
+  AuthService,
+  ServerService,
   HTTP_PROVIDERS,
   ROUTER_PROVIDERS,
   provide(APP_BASE_HREF, { useValue: '/' })
