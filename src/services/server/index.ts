@@ -4,7 +4,6 @@ import 'rxjs/add/operator/map';
 
 const HEADERS = new Headers({ 'Content-Type': 'application/json' });
 
-
 @Injectable()
 export class ServerService {
 
@@ -33,10 +32,4 @@ export class ServerService {
   public delete(path, id) {
     return this._http.delete(this.BASE_URL + path + '/' + id);
   }
-
 }
-
-export var SERVER_PROVIDERS: Array<any> = [
-  provide(ServerService, {useClass: ServerService})
-];
-

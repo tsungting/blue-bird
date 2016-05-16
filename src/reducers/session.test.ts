@@ -1,13 +1,7 @@
 import * as assert from 'assert';
 import fireAction from '../utils/fire-action';
-import sessionReducer from '../reducers/session';
-
-import {
-  LOGIN_USER_PENDING,
-  LOGIN_USER_SUCCESS,
-  LOGIN_USER_ERROR,
-  LOGOUT_USER,
-} from '../../src/constants/index';
+import { sessionReducer } from '../reducers/session';
+import { SessionActions } from '../actions/session';
 
 import { Map } from 'immutable';
 
@@ -22,7 +16,10 @@ describe('Session Reducer', () => {
 
   describe('on LOGIN_USER_PENDING', () => {
     it('should set loading to true', () => {
-      state = fireAction(sessionReducer, state, LOGIN_USER_PENDING);
+      state = fireAction(
+        sessionReducer,
+        state,
+        SessionActions.LOGIN_USER_PENDING);
       expect(state.get('isLoading')).toBeTruthy;
       expect(state.get('token')).toEqual(null);
     });
@@ -33,7 +30,7 @@ describe('Session Reducer', () => {
       state = fireAction(
         sessionReducer,
         state,
-        LOGIN_USER_SUCCESS,
+        SessionActions.LOGIN_USER_SUCCESS,
         { token: 1234 });
 
       expect(state.get('isLoading')).toBeFalsy;
@@ -43,8 +40,11 @@ describe('Session Reducer', () => {
   });
 
   describe('on LOGIN_USER_ERROR', () => {
-    it('should set loading to be false', () => {
-      state = fireAction(sessionReducer, state, LOGIN_USER_ERROR);
+    it('should save the username', () => {
+      state = fireAction(
+        sessionReducer,
+        state,
+        SessionActions.LOGIN_USER_ERROR);
 
       expect(state.get('isLoading')).toBeFalsy;
       expect(state.get('hasError')).toBeTruthy;
@@ -53,8 +53,11 @@ describe('Session Reducer', () => {
 
 
   describe('on LOGOUT_USER', () => {
-    it('should wipe out the user token', () => {
-      state = fireAction(sessionReducer, state, LOGOUT_USER);
+    it('should save the username', () => {
+      state = fireAction(
+        sessionReducer,
+        state,
+        SessionActions.LOGOUT_USER);
 
       expect(state.get('isLoading')).toBeTruthy;
       expect(state.get('hasError')).toBeFalsy;

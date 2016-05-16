@@ -3,12 +3,15 @@ import { RouteConfig, ROUTER_DIRECTIVES } from '@angular/router-deprecated';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs/Observable';
 import { Map } from 'immutable';
-import { NgRedux } from 'ng2-redux';
+import { NgRedux, select } from 'ng2-redux';
 
-import { IAppState } from '../store/app-state';
+import { IAppState } from '../reducers';
+import { ISession } from '../reducers/session';
 import { SessionActions } from '../actions/session';
 import { RioAboutPage } from './about-page';
 import { RioCounterPage } from './counter-page';
+import rootReducer from '../reducers';
+import { middleware, enhancers } from '../store';
 
 import {
   RioButton,
@@ -17,7 +20,6 @@ import {
   RioLogo,
   RioLoginModal
 } from '../components';
-
 
 @Component({
   selector: 'rio-sample-app',
@@ -45,48 +47,29 @@ import {
   }
 ])
 export class RioSampleApp {
-  private hasError$: Observable<boolean>;
-  private isLoading$: Observable<boolean>;
-  private loggedIn$: Observable<boolean>;
-  private loggedOut$: Observable<boolean>;
-  private userName$: Observable<string>;
-  private unsubscribe: () => void;
+  @select() session$: Observable<ISession>;
+
+  hasError$: Observable<boolean>;
+  isLoading$: Observable<boolean>;
+  loggedIn$: Observable<boolean>;
+  loggedOut$: Observable<boolean>;
+  userName$: Observable<string>;
 
   constructor(
     private ngRedux: NgRedux<IAppState>,
-    applicationRef: ApplicationRef,
-    private sessionActions: SessionActions) {
+    private actions: SessionActions) {
 
-    const session$: Observable<Map<string, any>>
-      = ngRedux.select<Map<string, any>>('session');
+    ngRedux.configureStore(rootReducer, {}, middleware, enhancers);
 
-    this.hasError$ = session$.map(s => !!s.get('hasError'));
-    this.isLoading$ = session$.map(s => !!s.get('isLoading'));
-    this.loggedIn$ = session$.map(s => !!s.get('token'));
+    this.hasError$  = this.session$.map(s => !!s.get('hasError'));
+    this.isLoading$ = this.session$.map(s => !!s.get('isLoading'));
+    this.loggedIn$  = this.session$.map(s => !!s.get('token'));
     this.loggedOut$ = this.loggedIn$.map(loggedIn => !loggedIn);
-
-    this.userName$ = session$.map(s => {
-        return [
-          s.getIn(['user', 'firstName'], ''),
-          s.getIn(['user', 'lastName'], '')
-         ].join(' ');
-      });
-
-    ngRedux.mapDispatchToTarget((dispatch) => {
-      return {
-        login: (credentials) => dispatch(
-          this.sessionActions.loginUser(credentials)),
-        logout: () => dispatch(
-          this.sessionActions.logoutUser())
-      };
-    })(this);
-
-    this.unsubscribe = ngRedux.subscribe(() => {
-      applicationRef.tick();
+    this.userName$  = this.session$.map(s => {
+      return [
+        s.getIn(['user', 'firstName'], ''),
+        s.getIn(['user', 'lastName'], '')
+        ].join(' ');
     });
-  }
-
-  ngOnDestroy() {
-    this.unsubscribe();
   }
 };

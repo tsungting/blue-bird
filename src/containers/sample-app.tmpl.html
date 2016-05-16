@@ -1,6 +1,6 @@
 <div>
   <rio-login-modal
-    (onSubmit)="login($event)"
+    (onSubmit)="actions.loginUser($event)"
     [hasError]="hasError$ | async"
     [isPending]="isLoading$ | async"
     *ngIf="loggedOut$ | async">
@@ -28,7 +28,7 @@
     </rio-navigator-item>
 
     <rio-navigator-item [hidden]="loggedOut$ | async">
-      <rio-button className="bg-red white" (click)="logout()" >
+      <rio-button className="bg-red white" (click)="actions.logoutUser()" >
         Logout
       </rio-button>
     </rio-navigator-item>

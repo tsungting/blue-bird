@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
-import { INCREMENT_COUNTER, DECREMENT_COUNTER } from '../constants';
+import { NgRedux } from 'ng2-redux';
+import { IAppState } from '../reducers';
 
 @Injectable()
 export class CounterActions {
+  static INCREMENT_COUNTER = 'INCREMENT_COUNTER';
+  static DECREMENT_COUNTER = 'DECREMENT_COUNTER';
+
+  constructor(private ngRedux: NgRedux<IAppState>) {}
+
   increment() {
-    return {
-      type: INCREMENT_COUNTER
-    };
+    this.ngRedux.dispatch({ type: CounterActions.INCREMENT_COUNTER });
   }
 
   decrement() {
-    return {
-      type: DECREMENT_COUNTER
-    };
+    this.ngRedux.dispatch({ type: CounterActions.DECREMENT_COUNTER });
   }
 }
