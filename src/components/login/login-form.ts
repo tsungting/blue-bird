@@ -22,7 +22,8 @@ import { RioInput } from '../form/input';
     <rio-form
       [formModel]="group"
       (onSubmit)="handleSubmit()">
-      <rio-alert status='info' *ngIf="isPending">Loading...</rio-alert>
+      <rio-alert qaid="qa-pending" status='info'
+        *ngIf="isPending">Loading...</rio-alert>
       <rio-alert
         qaid="qa-alert"
         status='error'*ngIf="hasError">
