@@ -1,16 +1,8 @@
 ///<reference path="./dev-types.d.ts"/>
 
 import { Map, fromJS } from 'immutable';
-import logger from './configure-logger';
-import promiseMiddleware from '../middleware/promise-middleware';
-
 const persistState = require('redux-localstorage');
-const ReduxThunk = require('redux-thunk').default;
-
-const baseMiddleware = [ 
-  promiseMiddleware,
-  ReduxThunk
-];
+import logger from './configure-logger';
 
 const baseEnhancers = [
   persistState('session', {
@@ -25,9 +17,7 @@ const baseEnhancers = [
   })
 ];
 
-export const middleware = __DEV__ ?
-  [ ...baseMiddleware, logger ] :
-  baseMiddleware;
+export const middleware = __DEV__ ? [ logger ] : [];
 
 export const enhancers = __DEV__ ?
   [ ...baseEnhancers, window.devToolsExtension() ] :

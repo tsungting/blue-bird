@@ -1,5 +1,4 @@
-declare let __DEV__: any;
-import {Iterable} from 'immutable';
+import { Iterable } from 'immutable';
 const createLogger = require('redux-logger');
 
 const logger = createLogger({

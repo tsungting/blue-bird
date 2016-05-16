@@ -3,7 +3,7 @@ import { RouteConfig, ROUTER_DIRECTIVES } from '@angular/router-deprecated';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs/Observable';
 import { Map } from 'immutable';
-import { NgRedux, select, dispatch } from 'ng2-redux';
+import { NgRedux, select } from 'ng2-redux';
 
 import { IAppState } from '../reducers';
 import { ISession } from '../reducers/session';
@@ -55,12 +55,9 @@ export class RioSampleApp {
   loggedOut$: Observable<boolean>;
   userName$: Observable<string>;
 
-  @dispatch(creds => this.sessionActions.loginUser(creds)) loginUser;
-  @dispatch(() => this.sessionActions.logoutUser)          logoutUser;
-
   constructor(
     private ngRedux: NgRedux<IAppState>,
-    private sessionActions: SessionActions) {
+    private actions: SessionActions) {
 
     ngRedux.configureStore(rootReducer, {}, middleware, enhancers);
 
@@ -74,13 +71,5 @@ export class RioSampleApp {
         s.getIn(['user', 'lastName'], '')
         ].join(' ');
     });
-  }
-
-  login(credentials) {
-    this.ngRedux.dispatch(<any>this.sessionActions.loginUser(credentials));
-  }
-
-  logout() {
-    this.ngRedux.dispatch(this.sessionActions.logoutUser());
   }
 };

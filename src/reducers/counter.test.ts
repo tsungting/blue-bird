@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import fireAction from '../utils/fire-action';
 import { counterReducer } from './counter';
-import { INCREMENT_COUNTER, DECREMENT_COUNTER } from '../constants';
+import { CounterActions } from '../actions/counter';
 import { Map } from 'immutable';
 
 let state = counterReducer();
@@ -16,7 +16,10 @@ describe('counter reducer', () => {
   describe('on INCREMENT_COUNTER', () => {
     it('should increment state.count', () => {
       const previousValue = state.get('count');
-      state = fireAction(counterReducer, state, INCREMENT_COUNTER);
+      state = fireAction(
+        counterReducer,
+        state,
+        CounterActions.INCREMENT_COUNTER);
       expect(state.get('count')).toEqual(1);
     });
   });
@@ -24,7 +27,10 @@ describe('counter reducer', () => {
   describe('on DECREMENT_COUNTER', () => {
     it('should decrement state.count', () => {
       const previousValue = state.get('count');
-      state = fireAction(counterReducer, state, DECREMENT_COUNTER);
+      state = fireAction(
+        counterReducer,
+        state,
+        CounterActions.DECREMENT_COUNTER);
       expect(state.get('count')).toEqual(previousValue - 1);
     });
   });
