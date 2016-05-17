@@ -15,11 +15,11 @@ describe('Component: Logo', () => {
     async(inject([TestComponentBuilder], (tcb: TestComponentBuilder) => {
       return tcb.createAsync(RioLogo)
         .then((fixture: ComponentFixture<any>) => {
-          fixture.componentInstance.LogoImage = 'test_location';
+          fixture.componentInstance.LogoImage = 'data:image/gif;base64,fake';
           fixture.detectChanges();
           let compiled = fixture.debugElement.nativeElement;
           expect(compiled.querySelector('img').getAttribute('src'))
-            .toBe('test_location');
+            .toBe('data:image/gif;base64,fake');
         });
     })));
 });
