@@ -19,6 +19,6 @@ const baseEnhancers = [
 
 export const middleware = __DEV__ ? [ logger ] : [];
 
-export const enhancers = __DEV__ ?
+export const enhancers = __DEV__ && window.devToolsExtension ?
   [ ...baseEnhancers, window.devToolsExtension() ] :
   baseEnhancers;
