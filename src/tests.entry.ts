@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import 'core-js/es6';
 import 'core-js/es7/reflect';
 import 'reflect-metadata';
@@ -23,8 +24,9 @@ import {
 setBaseTestProviders(TEST_BROWSER_DYNAMIC_PLATFORM_PROVIDERS,
   TEST_BROWSER_DYNAMIC_APPLICATION_PROVIDERS);
 
-let testContext = (<{ context?: Function }>require).context(
-  './',
-  true,
-  /\.test\.ts/);
+import './index.ts';
+
+const testContext = (<{ context?: Function }>require)
+  .context('./', true, /\.test\.ts$/);
+
 testContext.keys().forEach(testContext);
