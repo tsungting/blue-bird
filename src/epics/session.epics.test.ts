@@ -1,6 +1,7 @@
 import {
   fakeAsync,
-  inject
+  inject,
+  TestBed,
 } from '@angular/core/testing';
 import {
   HttpModule,
@@ -12,24 +13,28 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/throw';
 import {SessionActions} from '../actions/session.actions';
 import {SessionEpics} from './session.epics';
-import {TestBed} from '@angular/core/testing/test_bed';
 import {
   MockBackend,
   MockConnection
 } from '@angular/http/testing/mock_backend';
+import {configureTests} from '../tests.configure';
 
 describe('SessionEpics', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpModule],
-      providers: [
-        {
-          provide: XHRBackend,
-          useClass: MockBackend
-        },
-        SessionEpics
-      ]
-    });
+  beforeEach(done => {
+    const configure = (testBed: TestBed) => {
+      testBed.configureTestingModule({
+        imports: [HttpModule],
+        providers: [
+          {
+            provide: XHRBackend,
+            useClass: MockBackend
+          },
+          SessionEpics
+        ]
+      });
+    };
+
+    configureTests(configure).then(done);
   });
 
   it(

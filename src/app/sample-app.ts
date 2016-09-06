@@ -1,5 +1,4 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { ROUTER_DIRECTIVES } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs/Observable';
 import { DevToolsExtension, NgRedux, select } from 'ng2-redux';
@@ -19,6 +18,8 @@ import {
   RioLogo,
   RioLoginModal
 } from '../components';
+
+import {dev} from '../configuration';
 
 @Component({
   selector: 'rio-sample-app',
@@ -42,7 +43,7 @@ export class RioSampleApp {
     private actions: SessionActions,
     private epics: SessionEpics) {
 
-    const enh = (__DEV__ && devTools.isEnabled()) ?
+    const enh = (dev && devTools.isEnabled()) ?
       [ ... enhancers, devTools.enhancer({
         deserializeState: reimmutify,
       }) ] :
