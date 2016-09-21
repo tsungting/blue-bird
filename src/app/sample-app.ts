@@ -8,19 +8,10 @@ import { createEpicMiddleware } from 'redux-observable';
 import { IAppState, ISession, rootReducer } from '../store';
 import { SessionActions } from '../actions/session.actions';
 import { SessionEpics } from '../epics/session.epics';
-import { RioAboutPage, RioCounterPage } from '../pages';
 import { middleware, enhancers, reimmutify } from '../store';
-
-import {
-  RioButton,
-  RioNavigator,
-  RioNavigatorItem,
-  RioLogo,
-  RioLoginModal
-} from '../components';
+import {TickerTimer} from '../services/ticker-timer';
 
 import {dev} from '../configuration';
-
 @Component({
   selector: 'rio-sample-app',
   // Allow app to define global styles.
@@ -41,6 +32,7 @@ export class RioSampleApp {
     private ngRedux: NgRedux<IAppState>,
     private ngReduxRouter: NgReduxRouter,
     private actions: SessionActions,
+    private TickerTimer : TickerTimer,
     private epics: SessionEpics) {
 
     const enh = (dev && devTools.isEnabled()) ?
@@ -53,5 +45,6 @@ export class RioSampleApp {
 
     ngRedux.configureStore(rootReducer, {}, middleware, enhancers);
     ngReduxRouter.initialize();
+    this.TickerTimer.startTickers();
   }
 };

@@ -1,6 +1,8 @@
 import {NgModule}      from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {BrowserModule} from '@angular/platform-browser';
+import {TickerTimer} from '../services/ticker-timer';
+import {TickerActions} from '../actions/ticker.actions';
 import {
   DevToolsExtension,
   NgRedux
@@ -20,8 +22,9 @@ import {SessionActions} from '../actions/session.actions';
 import {SessionEpics} from '../epics/session.epics';
 import {
   RioAboutPage,
-  RioCounterPage
+  RioCounterPage,
 } from '../pages';
+import {DashboardPage} from '../pages/dashboard.page';
 import {RioCounter} from '../components/counter/counter.component';
 import {RioLoginModule} from '../components/login/login.module';
 import {RioUiModule} from '../components/ui/ui.module';
@@ -42,6 +45,7 @@ import {RioNavigatorModule} from '../components/navigator/navigator.module';
     RioSampleApp,
     RioAboutPage,
     RioCounterPage,
+    DashboardPage,
     RioCounter
   ],
   bootstrap: [
@@ -54,7 +58,9 @@ import {RioNavigatorModule} from '../components/navigator/navigator.module';
     NgReduxRouter,
     appRoutingProviders,
     SessionActions,
-    SessionEpics
+    SessionEpics,
+    TickerTimer,
+    TickerActions
   ]
 })
 export class RioSampleAppModule { }

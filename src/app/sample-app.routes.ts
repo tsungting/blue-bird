@@ -1,5 +1,5 @@
 import {Routes} from '@angular/router';
-
+import {DashboardPage} from '../pages/dashboard.page';
 import {
   RioCounterPage,
   RioAboutPage
@@ -15,4 +15,7 @@ export const SAMPLE_APP_ROUTES: Routes = [{
 }, {
   path: 'about',
   component: RioAboutPage
+}, {
+  path: 'dashboard',
+  component: DashboardPage
 }];
