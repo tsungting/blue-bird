@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {BrowserModule} from '@angular/platform-browser';
 import {TickerTimer} from '../services/ticker-timer';
 import {TickerActions} from '../actions/ticker.actions';
+import {TickerApi} from '../services/ticker-api';
 import {
   DevToolsExtension,
   NgRedux
@@ -54,6 +55,7 @@ import {RioNavigatorModule} from '../components/navigator/navigator.module';
   providers: [
     DevToolsExtension,
     FormBuilder,
+    TickerApi,
     NgRedux,
     NgReduxRouter,
     appRoutingProviders,

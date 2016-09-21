@@ -17,13 +17,7 @@ export {
 
 export let middleware = [];
 export let enhancers = [
-  persistState(
-    '',
-    {
-      key: 'angular2-redux-seed',
-      serialize: store => JSON.stringify(deimmutify(store)),
-      deserialize: state => reimmutify(JSON.parse(state)),
-    })
+
 ];
 
 if (dev) {
