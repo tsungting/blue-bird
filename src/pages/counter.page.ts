@@ -1,7 +1,7 @@
 import { Component, Inject, ApplicationRef } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { Observable } from 'rxjs/Observable';
 import { select } from 'ng2-redux';
+import { Observable } from 'rxjs/Observable';
 import { CounterActions } from '../actions';
 import { RioContainer, RioCounter } from '../components';
 import { ICounter } from '../store';

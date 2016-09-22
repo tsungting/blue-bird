@@ -8,7 +8,7 @@ import * as TickerReducer from './ticker/ticker.reducer';
 export interface IAppState {
   counter?: counter.ICounter;
   session?: session.ISession;
-  ticker?: {currentTicker : any};
+  ticker?: {currentTicker : any, evolutions : any};
 };
 
 export const rootReducer = combineReducers<IAppState>({
