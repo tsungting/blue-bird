@@ -12,7 +12,7 @@ export class TickerTimer {
 
   public startTickers() {
     Rx.Observable.timer(1000, 1000)
-      .take(10)
+      .take(100)
       .subscribe((value) => {
         this.tickerAction.getTickerValue();
       });
