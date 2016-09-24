@@ -25,27 +25,25 @@ export {
 export let middleware = [];
 export let enhancers = [];
 
-if (dev) {
-  middleware.push(
-    makeImmutable,
-    createLogger({
-      level: 'info',
-      collapsed: true,
-      stateTransformer: deimmutify,
-      actionTransformer: (action) => {
-        if (typeof action.payload !== 'object') {
-          return action;
-        }
-        return {
-          type: action.type,
-          payload: action.payload.toJS()
-        };
+middleware.push(
+  makeImmutable,
+  createLogger({
+    level: 'info',
+    collapsed: true,
+    stateTransformer: deimmutify,
+    actionTransformer: (action) => {
+      if (typeof action.payload !== 'object') {
+        return action;
       }
-    })
-  );
+      return {
+        type: action.type,
+        payload: action.payload.toJS()
+      };
+    }
+  })
+);
 
-  const environment: any = window || this;
-  if (environment.devToolsExtension) {
-    enhancers.push(environment.devToolsExtension());
-  }
+const environment: any = window || this;
+if (environment.devToolsExtension) {
+  enhancers.push(environment.devToolsExtension());
 }
