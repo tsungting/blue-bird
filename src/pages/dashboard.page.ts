@@ -38,7 +38,7 @@ import {Goal} from '../types/goal';
           <bb-label title="Cashflow" [content]="evolution.cashflow"></bb-label>
         </div>
         <div class="col col-2">
-          <bb-label title="Market Value" [content]="getMarketValue(evolution)"></bb-label>
+          <bb-label title="Net Worth" [content]="getMarketValue(evolution)"></bb-label>
         </div>
       </div>
     </rio-container>
