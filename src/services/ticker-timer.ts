@@ -12,7 +12,7 @@ export class TickerTimer {
 
 
   public startTickers() {
-    let interval = 1;
+    let interval = 100;
     let iteration = 200;
     Rx.Observable.timer(interval, interval)
       .take(iteration)
