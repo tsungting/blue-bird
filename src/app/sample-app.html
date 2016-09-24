@@ -1,31 +1,25 @@
 <div>
-  <rio-login-modal
-    (onSubmit)="actions.loginUser($event)"
-    [hasError]="hasError$ | async"
-    [isPending]="isLoading$ | async"
-    *ngIf="loggedOut$ | async">
-  </rio-login-modal>
   <rio-navigator testid="navigator">
     <rio-navigator-item [mr]=true>
       <rio-logo></rio-logo>
     </rio-navigator-item>
-    <rio-navigator-item *ngIf="loggedIn$ | async" [mr]=true>
+    <rio-navigator-item [mr]=true>
       <a [routerLink]="['/dashboard']"
          class="text-decoration-none">Dashboard</a>
     </rio-navigator-item>
-    <rio-navigator-item *ngIf="loggedIn$ | async" [mr]=true>
+    <rio-navigator-item [mr]=true>
       <a [routerLink]="['/counter']"
         class="text-decoration-none">Counter</a>
     </rio-navigator-item>
 
-    <rio-navigator-item *ngIf="loggedIn$ | async">
+    <rio-navigator-item>
       <a [routerLink]="['/about']"
         class="text-decoration-none">About Us</a>
     </rio-navigator-item>
 
     <div class="flex flex-auto"></div>
 
-    <rio-navigator-item testid="user-profile" *ngIf="loggedIn$ | async" [mr]=true>
+    <rio-navigator-item testid="user-profile" [mr]=true>
       {{ firstName$ | async }} {{ lastName$ | async }}
     </rio-navigator-item>
 

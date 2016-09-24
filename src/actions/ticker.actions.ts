@@ -10,15 +10,14 @@ export class TickerActions {
   static TICKER_UPDATED = 'TICKER_UPDATED';
   static NEW_EVOLUTION_CREATED = 'NEW_EVOLUTION_CREATED';
 
-  constructor(private ngRedux:NgRedux<IAppState>,
-              private tickerApi:TickerApi,) {
-  }
-
+  constructor(private ngRedux: NgRedux<IAppState>,
+              private tickerApi: TickerApi) {}
+ 
   public getTickerValue() {
     let state = this.ngRedux.getState();
-    this.tickerApi.fetchCurrentPrice(state.ticker.currentTicker)
+    this.tickerApi.fetchCurrentPrice(state.ticker.get('currentTicker'))
       .subscribe((ticker) => {
-        let evolution = this.getEvolution(ticker, state.ticker.evolutions);
+        let evolution = this.getEvolution(ticker, state.ticker.get('evolutions').toJS());
         if (evolution) {
           this.ngRedux.dispatch({
             type: TickerActions.NEW_EVOLUTION_CREATED,
@@ -32,12 +31,8 @@ export class TickerActions {
       });
   }
 
-  private getEvolution(price, evolutions:Array<Evolution>) {
+  private getEvolution(price, evolutions: Array<Evolution>) {
     let evolution = evolutions[evolutions.length - 1];
-    console.log('price', price);
-    console.log('goals', evolution.goals);
-    console.log('stocks', evolution.ownedStocks);
-    console.log('cashflow', evolution.cashflow);
     if (this.canCompleteGoal(price, evolution)) {
       return this.makeResolveGoalEvolution(price, evolution);
     }
@@ -71,18 +66,18 @@ export class TickerActions {
     return new Evolution(price, newGoals, newStocks, newCashflow);
   }
 
-  private canMakeNewGoal(price, evolution:Evolution) {
+  private canMakeNewGoal(price, evolution: Evolution) {
     return this.canMakeGoalToSell(price, evolution) || this.canMakeGoalToBuy(price, evolution);
   }
 
-  private canMakeGoalToSell(price, evolution:Evolution) {
-    let existingGoalToSell = evolution.goals.find((goal:Goal)=> {
+  private canMakeGoalToSell(price, evolution: Evolution) {
+    let existingGoalToSell = evolution.goals.find((goal: Goal) => {
       return goal.price === price + 1;
     });
     return !existingGoalToSell && !this.isTooManyStocks(evolution.ownedStocks);
   }
 
-  private canMakeGoalToBuy(price, evolution:Evolution) {
+  private canMakeGoalToBuy(price, evolution: Evolution) {
     let existingGoalToBuy = evolution.goals.find((goal) => {
       return goal.price === price - 1;
     });
@@ -93,7 +88,7 @@ export class TickerActions {
     return stocks.length > 2;
   }
 
-  private makeResolveGoalEvolution(price, evolution:Evolution) {
+  private makeResolveGoalEvolution(price, evolution: Evolution) {
     let goal = this.getCompletableGoal(price, evolution.goals);
     let remainingGoals = this.getRemainingGoals(price, evolution.goals);
     let remainingStocks = this.getStocks(evolution.ownedStocks, goal, price);
@@ -105,13 +100,13 @@ export class TickerActions {
     return goal.isBuy ? originalCash - price : originalCash + price;
   }
 
-  private getStocks(stocks, goal:Goal, price) {
+  private getStocks(stocks, goal: Goal, price) {
     if (goal.isBuy) {
       stocks.push(price);
       return stocks;
     }
     stocks.pop();
-    return stocks
+    return stocks;
   }
 
   private getRemainingGoals(price, goals) {
@@ -120,15 +115,26 @@ export class TickerActions {
     });
   }
 
-  private canCompleteGoal(currentPrice, evolution:Evolution) {
+  private canCompleteGoal(currentPrice, evolution: Evolution) {
     if (!evolution) {
       return false;
     }
-    return !!this.getCompletableGoal(currentPrice, evolution.goals);
+    let completableGoal = this.getCompletableGoal(currentPrice, evolution.goals);
+    if (!completableGoal) {
+      return false;
+    }
+    if (this.isGoalSellButNoStock(completableGoal.isBuy, evolution.ownedStocks)) {
+      return false;
+    }
+    return true;
   }
 
-  private getCompletableGoal(price, goals) {
-    return goals.find((goal:Goal) => {
+  private isGoalSellButNoStock(isBuy, stocks) {
+    return !isBuy && stocks.length === 0;
+  }
+
+  private getCompletableGoal(price, goals): Goal {
+    return goals.find((goal: Goal) => {
       return goal.price === price;
     });
   }

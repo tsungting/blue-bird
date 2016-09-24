@@ -10,9 +10,12 @@ export class TickerTimer {
   constructor ( private tickerAction: TickerActions ) {
   }
 
+
   public startTickers() {
-    Rx.Observable.timer(1000, 1000)
-      .take(100)
+    let interval = 1;
+    let iteration = 200;
+    Rx.Observable.timer(interval, interval)
+      .take(iteration)
       .subscribe((value) => {
         this.tickerAction.getTickerValue();
       });

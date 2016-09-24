@@ -1,11 +1,12 @@
 import { Action } from 'redux';
 import { TickerActions } from '../../actions/ticker.actions';
 import {Evolution} from '../../types/evolution';
+import * as Immutable from 'immutable';
 
-export const INITIAL_STATE = {
+export const INITIAL_STATE = Immutable.fromJS({
   currentTicker: 10,
-  evolutions: [new Evolution()]
-};
+  evolutions: [JSON.parse(JSON.stringify(new Evolution()))]
+});
 
 export function tickerReducer(state = INITIAL_STATE,
                               action) {
@@ -13,11 +14,9 @@ export function tickerReducer(state = INITIAL_STATE,
   switch (action.type) {
 
     case TickerActions.TICKER_UPDATED:
-      state.currentTicker = action.payload;
-      return state;
+      return state.set('currentTicker', action.payload);
     case TickerActions.NEW_EVOLUTION_CREATED:
-      state.evolutions.push(action.payload);
-      return state;
+      return state.update('evolutions', (evolutions) => evolutions.push(action.payload));
     default:
       return state;
   }

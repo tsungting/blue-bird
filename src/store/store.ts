@@ -3,12 +3,12 @@ import { routerReducer } from 'ng2-redux-router';
 import * as counter from './counter';
 import * as session from './session';
 import * as TickerReducer from './ticker/ticker.reducer';
-
+import * as Immutable from 'immutable';
 
 export interface IAppState {
   counter?: counter.ICounter;
   session?: session.ISession;
-  ticker?: {currentTicker : any, evolutions : any};
+  ticker?: any;
 };
 
 export const rootReducer = combineReducers<IAppState>({
@@ -23,7 +23,7 @@ export function deimmutify(store) {
     counter: store.counter.toJS(),
     session: store.session.toJS(),
     router: store.router,
-    ticker: store.ticker
+    ticker: store.ticker.toJS()
   };
 }
 

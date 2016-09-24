@@ -65,4 +65,5 @@ import {RioNavigatorModule} from '../components/navigator/navigator.module';
     TickerActions
   ]
 })
-export class RioSampleAppModule { }
+export class RioSampleAppModule {
+}

@@ -4,6 +4,7 @@ import {RioAlert} from '../alert/alert.component';
 import {RioButton} from '../button/button.component';
 import {RioLogo} from '../logo/logo.component';
 import {RioContainer} from '../container/container.component';
+import {BbLabel} from '../labels/index';
 
 @NgModule({
   imports: [
@@ -13,13 +14,15 @@ import {RioContainer} from '../container/container.component';
     RioAlert,
     RioButton,
     RioLogo,
-    RioContainer
+    RioContainer,
+    BbLabel
   ],
   exports: [
     RioAlert,
     RioButton,
     RioLogo,
-    RioContainer
+    RioContainer,
+    BbLabel
   ]
 })
 export class RioUiModule { }

@@ -12,7 +12,7 @@ const BASE_URL = '/api';
 
 @Injectable()
 export class TickerApi {
-  constructor(private http:Http) {
+  constructor(private http: Http) {
   }
 
   public fetchCurrentPrice(previousPrice) {
