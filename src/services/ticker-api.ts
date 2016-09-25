@@ -16,7 +16,7 @@ export class TickerApi {
   }
 
   public fetchCurrentPrice(previousPrice) {
-    //TODO : When we hook it up to actual API, do it here with rest
+    // TODO : When we hook it up to actual API, do it here with rest
     return Rx.Observable.from([1])
       .map((response) => this.transformTicker(response, previousPrice));
   }

@@ -35,10 +35,10 @@ import {Goal} from '../types/goal';
           </div>
         </div>
         <div class="col col-2">
-          <bb-label title="Cashflow" [content]="evolution.cashflow"></bb-label>
+          <bb-label title="Cashflow" [content]="formatCashflow(evolution)"></bb-label>
         </div>
         <div class="col col-2">
-          <bb-label title="Net Worth" [content]="getMarketValue(evolution)"></bb-label>
+          <bb-label title="Profitibility" [content]="getMarketValue(evolution)"></bb-label>
         </div>
       </div>
     </rio-container>
@@ -55,7 +55,7 @@ export class DashboardPage {
       .filter((value) => value)
       .map((value) => value.toJS())
       .subscribe((evolutions) => {
-        this.evolutions = evolutions;
+        this.evolutions = evolutions.slice(1);
       });
   }
 
@@ -67,5 +67,9 @@ export class DashboardPage {
   private getMarketValue(evolution: Evolution) {
     let value = (evolution.price * evolution.ownedStocks.length) + evolution.cashflow;
     return `$ ${value}`;
+  }
+
+  private formatCashflow(evolution: Evolution) {
+    return `$ ${evolution.cashflow}`;
   }
 }

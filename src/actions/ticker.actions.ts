@@ -11,8 +11,9 @@ export class TickerActions {
   static NEW_EVOLUTION_CREATED = 'NEW_EVOLUTION_CREATED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
-              private tickerApi: TickerApi) {}
- 
+              private tickerApi: TickerApi) {
+  }
+
   public getTickerValue() {
     let state = this.ngRedux.getState();
     this.tickerApi.fetchCurrentPrice(state.ticker.get('currentTicker'))
@@ -39,6 +40,11 @@ export class TickerActions {
     if (this.canMakeNewGoal(price, evolution)) {
       return this.makeNewGoalEvolution(price, evolution);
     }
+    return this.makeNoActionEvolution(price, evolution);
+  }
+
+  private makeNoActionEvolution(price, evolution: Evolution) {
+    return new Evolution(price, evolution.goals, evolution.ownedStocks, evolution.cashflow);
   }
 
   private makeNewGoalEvolution(price, evolution) {
