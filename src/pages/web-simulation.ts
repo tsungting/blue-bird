@@ -14,7 +14,7 @@ import {TickerActions} from '../actions/ticker.actions';
   template: `
      <rio-container [size]=4 [center]=true>
       <div class="col col-12 center">
-        <h2 class="caps">start ticker</h2> <button class="btn btn-primary" (click)="startWebTicker()">Go</button>
+        <h2 class="caps">Web Simulation</h2> <button class="btn btn-primary" (click)="startWebTicker()">Start</button>
       </div>
       <bb-label title="Current Ticker" [content]="ticker$ | async"></bb-label>
 
