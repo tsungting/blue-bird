@@ -26,7 +26,7 @@ import {TickerActions} from '../actions/ticker.actions';
 })
 export class WebSimulationPage {
   @select(state => state.ticker.get('currentTicker')) private ticker$;
-  @select(state => state.ticker.get('evolutions')) private evolutions$;
+  @select(state => state.ticker.get('webEvolutions')) private evolutions$;
 
   private evolutions: Array<Evolution> = [];
 

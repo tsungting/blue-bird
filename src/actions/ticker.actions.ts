@@ -6,11 +6,13 @@ import {Goal} from '../types/goal';
 import {Evolution} from '../types/evolution';
 
 import {RandomTickerEvolutionGenerator} from '../services/random-ticker-evolution-generator';
+import {WebTickerEvolutionGenerator} from '../services/web-ticker-evolution-generator';
 
 @Injectable()
 export class TickerActions {
   static TICKER_UPDATED = 'TICKER_UPDATED';
   static NEW_EVOLUTION_CREATED = 'NEW_EVOLUTION_CREATED';
+  static NEW_WEB_EVOLUTION_CREATED = 'NEW_WEB_EVOLUTION_CREATED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private tickerApi: TickerApi) {
@@ -20,27 +22,41 @@ export class TickerActions {
     let state = this.ngRedux.getState();
     this.tickerApi.fetchNextRandomPrice(state.ticker.get('currentTicker'))
       .subscribe((ticker) => {
+        state = this.ngRedux.getState();
         let generator = new RandomTickerEvolutionGenerator();
         let evolution = generator.getEvolution(ticker, state.ticker.get('evolutions').toJS());
         if (evolution) {
-          this.ngRedux.dispatch({
-            type: TickerActions.NEW_EVOLUTION_CREATED,
-            payload: evolution
-          });
+          this.dispatchEvolution(evolution, TickerActions.NEW_EVOLUTION_CREATED);
         }
-        this.ngRedux.dispatch({
-          type: TickerActions.TICKER_UPDATED,
-          payload: ticker
-        });
+        this.dispatchTicker(ticker);
       });
   }
 
   public getWebTicker() {
     this.tickerApi.fetchHistoryFor('FB')
       .subscribe((ticker) => {
-        console.log(ticker);
+        let state = this.ngRedux.getState();
+        let generator = new WebTickerEvolutionGenerator();
+        let evolution = generator.getEvolution(ticker, state.ticker.get('webEvolutions').toJS());
+        if (evolution) {
+          this.dispatchEvolution(evolution, TickerActions.NEW_WEB_EVOLUTION_CREATED);
+        }
+        this.dispatchTicker(ticker);
       });
   }
 
+  private dispatchEvolution(evolution, name) {
+    this.ngRedux.dispatch({
+      type: name,
+      payload: evolution
+    });
+  }
+
+  private dispatchTicker(ticker) {
+    this.ngRedux.dispatch({
+      type: TickerActions.TICKER_UPDATED,
+      payload: ticker
+    });
+  }
 
 }

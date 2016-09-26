@@ -41,7 +41,7 @@ export class TickerApi {
     // "https://www.quandl.com/api/v3/datasets/WIKI/FB.json?column_index=4&start_date=2014-01-01&end_date=2014-12-31&collapse=monthly&transform=diff&api_key=YOURAPIKEY"
     let headers = new Headers();
     headers.append('Access-Control-Allow-Origin', '*');
-    return this.http.get(`https://www.quandl.com/api/v3/datasets/WIKI/${symbol}.json?api_key=9__kYHwVh4nsuTsQTSNF`, {
+    return this.http.get(`https://www.quandl.com/api/v3/datasets/WIKI/${symbol}.json?api_key=9__kYHwVh4nsuTsQTSNF&start_date=2014-01-01&end_date=2014-12-31`, {
       headers: headers
     })
       .map((result) => result.json())

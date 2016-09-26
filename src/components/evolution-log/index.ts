@@ -35,16 +35,16 @@ export class BbEvolutionLog {
 
   private getMarketValue(evolution: Evolution) {
     let value = (evolution.price * evolution.ownedStocks.length) + evolution.cashflow;
-    return `$ ${value}`;
+    return `$ ${value.toFixed(2)}`;
   }
 
   private formatCashflow(evolution: Evolution) {
-    return `$ ${evolution.cashflow}`;
+    return `$ ${evolution.cashflow.toFixed(2)}`;
   }
 
   private getGoalMessage(goal: Goal) {
     let action = goal.isBuy ? 'Buy ' : 'Sell ';
-    return `${action} at ${goal.price}`;
+    return `${action} at ${goal.price.toFixed(2)}`;
   }
 };
 
