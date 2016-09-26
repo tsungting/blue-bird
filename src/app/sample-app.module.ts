@@ -1,7 +1,6 @@
 import {NgModule}      from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {BrowserModule} from '@angular/platform-browser';
-import {TickerTimer} from '../services/ticker-timer';
 import {TickerActions} from '../actions/ticker.actions';
 import {TickerApi} from '../services/ticker-api';
 import {
@@ -63,7 +62,6 @@ import {RioNavigatorModule} from '../components/navigator/navigator.module';
     appRoutingProviders,
     SessionActions,
     SessionEpics,
-    TickerTimer,
     TickerActions
   ]
 })

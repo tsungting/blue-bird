@@ -9,7 +9,6 @@ import { IAppState, ISession, rootReducer } from '../store';
 import { SessionActions } from '../actions/session.actions';
 import { SessionEpics } from '../epics/session.epics';
 import { middleware, enhancers, reimmutify } from '../store';
-import {TickerTimer} from '../services/ticker-timer';
 
 import {dev} from '../configuration';
 @Component({
@@ -32,7 +31,6 @@ export class RioSampleApp {
     private ngRedux: NgRedux<IAppState>,
     private ngReduxRouter: NgReduxRouter,
     private actions: SessionActions,
-    private TickerTimer : TickerTimer,
     private epics: SessionEpics) {
 
     const enh = (dev && devTools.isEnabled()) ?
@@ -45,6 +43,5 @@ export class RioSampleApp {
 
     ngRedux.configureStore(rootReducer, {}, middleware, enhancers);
     ngReduxRouter.initialize();
-    this.TickerTimer.startTickers();
   }
 };
