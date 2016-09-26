@@ -4,12 +4,8 @@ import { Component } from '@angular/core';
   selector: 'rio-logo',
   styles: [require('./logo.css')],
   template: `
-    <div className="flex items-center">
-      <img
-        class="logo"
-        [src]="LogoImage"
-        alt="Rangle.io"
-      />
+    <div class="flex items-center">
+      <span class="h4 caps blue">(\\Blue Bird/) </span>
     </div>
   `
 })
