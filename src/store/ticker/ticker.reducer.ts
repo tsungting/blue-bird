@@ -19,7 +19,11 @@ export function tickerReducer(state = INITIAL_STATE,
     case TickerActions.NEW_EVOLUTION_CREATED:
       return state.update('evolutions', (evolutions) => evolutions.push(action.payload));
     case TickerActions.NEW_WEB_EVOLUTION_CREATED:
+      state = state.set('webApiStatus', 'Success');
       return state.update('webEvolutions', (evolutions) => evolutions.push(action.payload));
+    case TickerActions.WEB_REQUEST_STARTED:
+      state = state.update('webEvolutions', (evolutions) => Immutable.fromJS([JSON.parse(JSON.stringify(new Evolution()))]));
+      return state.set('webApiStatus', 'Loading');
     default:
       return state;
   }

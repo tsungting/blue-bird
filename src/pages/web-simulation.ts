@@ -14,7 +14,11 @@ import {TickerActions} from '../actions/ticker.actions';
   template: `
      <rio-container [size]=4 [center]=true>
       <div class="col col-12 center">
-        <h2 class="caps">Web Simulation</h2> <button class="btn btn-primary" (click)="startWebTicker()">Start</button>
+        <div>
+          <h2 class="inline-block caps">Simulate</h2> <input type="text" placeholder="Company Symbol" [(ngModel)]="symbol">
+        </div>
+        <button class="btn btn-primary" (click)="startWebTicker()">Start</button>
+        <span *ngIf="isLoading">Loading...</span>
       </div>
       <bb-label title="Current Ticker" [content]="ticker$ | async"></bb-label>
 
@@ -27,9 +31,11 @@ import {TickerActions} from '../actions/ticker.actions';
 export class WebSimulationPage {
   @select(state => state.ticker.get('currentTicker')) private ticker$;
   @select(state => state.ticker.get('webEvolutions')) private evolutions$;
+  @select(state => state.ticker.get('webApiStatus')) private webApiStatus$;
 
   private evolutions: Array<Evolution> = [];
-
+  private isLoading : boolean = false;
+  private symbol: string = '';
   constructor(private tickerActions: TickerActions) {
   }
 
@@ -40,10 +46,16 @@ export class WebSimulationPage {
       .subscribe((evolutions) => {
         this.evolutions = evolutions.slice(1);
       });
+
+    this.webApiStatus$
+      .filter((value) => value)
+      .subscribe((status) => {
+        this.isLoading = status === 'Loading';
+      });
   }
 
 
   public startWebTicker() {
-    this.tickerActions.getWebTicker();
+    this.tickerActions.getWebTicker(this.symbol);
   }
 }

@@ -5,7 +5,7 @@ import { Goal } from '../../types/goal';
 @Component({
   selector: 'bb-evolution-log',
   template: `
-    <div class="clearfix" *ngFor="let evolution of evolutions">
+    <div class="clearfix" *ngFor="let evolution of evolutions; trackBy:identify">
         <div class="col col-2">
           <bb-label title="Price" [content]="evolution.price"></bb-label>
         </div>
@@ -46,5 +46,10 @@ export class BbEvolutionLog {
     let action = goal.isBuy ? 'Buy ' : 'Sell ';
     return `${action} at ${goal.price.toFixed(2)}`;
   }
-};
+
+  private identify(evolution: Evolution) {
+    return evolution.price + evolution.cashflow + evolution.actionPointDown;
+  }
+}
+;
 

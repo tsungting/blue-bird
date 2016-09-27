@@ -12,6 +12,7 @@ import {WebTickerEvolutionGenerator} from '../services/web-ticker-evolution-gene
 export class TickerActions {
   static TICKER_UPDATED = 'TICKER_UPDATED';
   static NEW_EVOLUTION_CREATED = 'NEW_EVOLUTION_CREATED';
+  static WEB_REQUEST_STARTED = 'WEB_REQUEST_STARTED';
   static NEW_WEB_EVOLUTION_CREATED = 'NEW_WEB_EVOLUTION_CREATED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
@@ -32,8 +33,12 @@ export class TickerActions {
       });
   }
 
-  public getWebTicker() {
-    this.tickerApi.fetchHistoryFor('FB')
+  public getWebTicker(symbol = 'FB') {
+    this.ngRedux.dispatch({
+      type: TickerActions.WEB_REQUEST_STARTED,
+      payload: {symbol: symbol}
+    });
+    this.tickerApi.fetchHistoryFor(symbol)
       .subscribe((ticker) => {
         let state = this.ngRedux.getState();
         let generator = new WebTickerEvolutionGenerator();
