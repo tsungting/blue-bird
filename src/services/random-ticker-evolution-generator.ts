@@ -1,17 +1,35 @@
-
 import {Goal} from '../types/goal';
 import {Evolution} from '../types/evolution';
+import {Stock} from '../types/stock';
 
 export class RandomTickerEvolutionGenerator {
   public getEvolution(price, evolutions: Array<Evolution>) {
-    let evolution = evolutions[evolutions.length - 1];
-    if (this.canCompleteGoal(price, evolution)) {
-      return this.makeResolveGoalEvolution(price, evolution);
+    let referenceEvolution = this.getReferenceEvolution(evolutions);
+    if (this.canCompleteGoal(price, referenceEvolution)) {
+      return this.makeResolveGoalEvolution(price, referenceEvolution);
     }
-    if (this.canMakeNewGoal(price, evolution)) {
-      return this.makeNewGoalEvolution(price, evolution);
+    if (this.canMakeNewGoal(price, referenceEvolution)) {
+      return this.makeNewGoalEvolution(price, referenceEvolution);
     }
-    return this.makeNoActionEvolution(price, evolution);
+    return this.makeNoActionEvolution(price, referenceEvolution);
+  }
+
+  private getReferenceEvolution(evolutions) {
+    let referenceEvolution = evolutions[evolutions.length - 1];
+    if (referenceEvolution) {
+      referenceEvolution.goals = this.handleStatus(referenceEvolution.goals);
+      referenceEvolution.ownedStocks = this.handleStatus(referenceEvolution.ownedStocks);
+    }
+    return referenceEvolution;
+
+  }
+
+  private handleStatus(goals) {
+    let remainingStatus = goals.filter((goal) => goal.status !== 'deleted');
+    return remainingStatus.map((goal: Goal) => {
+      goal.status = '';
+      return goal;
+    });
   }
 
   private makeNoActionEvolution(price, evolution: Evolution) {
@@ -28,17 +46,18 @@ export class RandomTickerEvolutionGenerator {
   }
 
   private makeGoalToBuy(price, evolution) {
-    let newGoal = new Goal(price - 1, true);
+    let newGoal = new Goal(price - 1, true, 'new');
     let newGoals = evolution.goals.concat(newGoal);
     let newStocks = evolution.ownedStocks;
-    let newCashflow = evolution.cashflow + newStocks.pop();
+    newStocks[0].status = 'deleted';
+    let newCashflow = evolution.cashflow + price;
     return new Evolution(price, newGoals, newStocks, newCashflow);
   }
 
   private makeGoalToSell(price, evolution) {
-    let newGoal = new Goal(price + 1, false);
+    let newGoal = new Goal(price + 1, false, 'new');
     let newGoals = evolution.goals.concat(newGoal);
-    let newStocks = evolution.ownedStocks.concat(price);
+    let newStocks = evolution.ownedStocks.concat(new Stock(price, 'new'));
     let newCashflow = evolution.cashflow - price;
     return new Evolution(price, newGoals, newStocks, newCashflow);
   }
@@ -67,7 +86,7 @@ export class RandomTickerEvolutionGenerator {
 
   private makeResolveGoalEvolution(price, evolution: Evolution) {
     let goal = this.getCompletableGoal(price, evolution.goals);
-    let remainingGoals = this.getRemainingGoals(price, evolution.goals);
+    let remainingGoals = this.getRemainingGoals(goal.price, evolution.goals);
     let remainingStocks = this.getStocks(evolution.ownedStocks, goal, price);
     let remainingCashflow = this.getCashflow(evolution.cashflow, goal, price);
     return new Evolution(price, remainingGoals, remainingStocks, remainingCashflow);
@@ -79,16 +98,19 @@ export class RandomTickerEvolutionGenerator {
 
   private getStocks(stocks, goal: Goal, price) {
     if (goal.isBuy) {
-      stocks.push(price);
+      stocks.push(new Stock(price, 'new'));
       return stocks;
     }
-    stocks.pop();
+    stocks[0].status = 'deleted';
     return stocks;
   }
 
   private getRemainingGoals(price, goals) {
-    return goals.filter((goal) => {
-      return goal.price !== price;
+    return goals.map((goal: Goal) => {
+      if (goal.price === price) {
+        goal.status = 'deleted';
+      }
+      return goal;
     });
   }
 

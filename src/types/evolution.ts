@@ -1,10 +1,11 @@
 import {Goal} from './goal';
+import {Stock} from './stock';
 
 export class Evolution {
 
   public goals: Array<Goal> = [];
   public price: number = 0;
-  public ownedStocks: Array<number> = [];
+  public ownedStocks: Array<Stock> = [];
   public cashflow: number = 0;
   public actionPointUp : number = -1;
   public actionPointDown : number = -1;

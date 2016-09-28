@@ -1,20 +1,39 @@
 import {Goal} from '../types/goal';
 import {Evolution} from '../types/evolution';
+import {Stock} from '../types/stock';
 
 export class WebTickerEvolutionGenerator {
 
   public getEvolution(price, evolutions: Array<Evolution>) {
-    let evolution = evolutions[evolutions.length - 1];
-    if (this.canCompleteGoal(price, evolution)) {
-      return this.makeResolveGoalEvolution(price, evolution);
+    let referenceEvolution = this.getReferenceEvolution(evolutions);
+    if (this.canCompleteGoal(price, referenceEvolution)) {
+      return this.makeResolveGoalEvolution(price, referenceEvolution);
     }
-    if (!this.isActionPointReached(price, evolution)) {
-      return this.makeNoActionEvolution(price, evolution);
+    if (!this.isActionPointReached(price, referenceEvolution)) {
+      return this.makeNoActionEvolution(price, referenceEvolution);
     }
-    if (this.canMakeNewGoal(price, evolution)) {
-      return this.makeNewGoalEvolution(price, evolution);
+    if (this.canMakeNewGoal(price, referenceEvolution)) {
+      return this.makeNewGoalEvolution(price, referenceEvolution);
     }
-    return this.makeNoActionEvolution(price, evolution);
+    return this.makeNoActionEvolution(price, referenceEvolution);
+  }
+
+  private getReferenceEvolution(evolutions) {
+    let referenceEvolution = evolutions[evolutions.length - 1];
+    if (referenceEvolution) {
+      referenceEvolution.goals = this.handleStatus(referenceEvolution.goals);
+      referenceEvolution.ownedStocks = this.handleStatus(referenceEvolution.ownedStocks);
+    }
+    return referenceEvolution;
+
+  }
+
+  private handleStatus(goals) {
+    let remainingStatus = goals.filter((goal) => goal.status !== 'deleted');
+    return remainingStatus.map((goal: Goal) => {
+      goal.status = '';
+      return goal;
+    });
   }
 
   private isActionPointReached(price, evolution: Evolution) {
@@ -35,19 +54,20 @@ export class WebTickerEvolutionGenerator {
   }
 
   private makeGoalToBuy(price, evolution) {
-    let newGoal = new Goal(price - this.getThreshold(price), true);
+    let newGoal = new Goal(price - this.getThreshold(price), true, 'new');
     let newGoals = evolution.goals.concat(newGoal);
     let newStocks = evolution.ownedStocks;
-    let newCashflow = evolution.cashflow + newStocks.pop();
+    let newCashflow = evolution.cashflow + price;
+    newStocks[0].status = 'deleted';
     let actionDown = price - this.getThreshold(price);
     let actionUp = price + this.getThreshold(price);
     return new Evolution(price, newGoals, newStocks, newCashflow, actionUp, actionDown);
   }
 
   private makeGoalToSell(price, evolution) {
-    let newGoal = new Goal(price + this.getThreshold(price), false);
+    let newGoal = new Goal(price + this.getThreshold(price), false, 'new');
     let newGoals = evolution.goals.concat(newGoal);
-    let newStocks = evolution.ownedStocks.concat(price);
+    let newStocks = evolution.ownedStocks.concat(new Stock(price, 'new'));
     let newCashflow = evolution.cashflow - price;
     let actionDown = price - this.getThreshold(price);
     let actionUp = price + this.getThreshold(price);
@@ -96,16 +116,19 @@ export class WebTickerEvolutionGenerator {
 
   private getStocks(stocks, goal: Goal, price) {
     if (goal.isBuy) {
-      stocks.push(price);
+      stocks.push(new Stock(price, 'new'));
       return stocks;
     }
-    stocks.pop();
+    stocks[0].status = 'deleted';
     return stocks;
   }
 
   private getRemainingGoals(price, goals) {
-    return goals.filter((goal) => {
-      return goal.price !== price;
+    return goals.map((goal: Goal) => {
+      if (goal.price === price) {
+        goal.status = 'deleted';
+      }
+      return goal;
     });
   }
 
