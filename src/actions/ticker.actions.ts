@@ -33,7 +33,7 @@ export class TickerActions {
       });
   }
 
-  public getWebTicker(symbol = 'FB') {
+  public getWebTicker(symbol = 'FB', actionPoint = '0.05', stockPool = '3') {
     this.ngRedux.dispatch({
       type: TickerActions.WEB_REQUEST_STARTED,
       payload: {symbol: symbol}
@@ -41,7 +41,7 @@ export class TickerActions {
     this.tickerApi.fetchHistoryFor(symbol)
       .subscribe((ticker) => {
         let state = this.ngRedux.getState();
-        let generator = new WebTickerEvolutionGenerator();
+        let generator = new WebTickerEvolutionGenerator(actionPoint, stockPool);
         let evolution = generator.getEvolution(ticker, state.ticker.get('webEvolutions').toJS());
         if (evolution) {
           this.dispatchEvolution(evolution, TickerActions.NEW_WEB_EVOLUTION_CREATED);

@@ -4,6 +4,14 @@ import {Stock} from '../types/stock';
 
 export class WebTickerEvolutionGenerator {
 
+  private actionPoint = 0.05;
+  private stockPool = 3;
+
+  constructor(actionPoint = '0.05', stockPool = '3'){
+    this.actionPoint = parseFloat(actionPoint);
+    this.stockPool = parseInt(stockPool);
+  }
+
   public getEvolution(price, evolutions: Array<Evolution>) {
     let referenceEvolution = this.getReferenceEvolution(evolutions);
     if (this.canCompleteGoal(price, referenceEvolution)) {
@@ -16,6 +24,18 @@ export class WebTickerEvolutionGenerator {
       return this.makeNewGoalEvolution(price, referenceEvolution);
     }
     return this.makeNoActionEvolution(price, referenceEvolution);
+  }
+
+  private makeResetGoalEvolution(price, evolution){
+    let newGoals = evolution.goals.map((goal: Goal) => {
+      goal.status = 'deleted';
+      return goal;
+    })
+    return new Evolution(price, newGoals, evolution.ownedStocks, evolution.cashflow, evolution.actionPointUp, evolution.actionPointDown);
+  }
+
+  private shouldStartOver(price, referenceEvolution){
+    return referenceEvolution.ownedStocks.length === 0;
   }
 
   private getReferenceEvolution(evolutions) {
@@ -86,18 +106,18 @@ export class WebTickerEvolutionGenerator {
   }
 
   private getThreshold(price) {
-    return price * 0.03;
+    return price * this.actionPoint;
   }
 
   private canMakeGoalToBuy(price, evolution: Evolution) {
     let existingGoalToBuy = evolution.goals.find((goal) => {
       return goal.price < price - this.getThreshold(price) && goal.price > price - (this.getThreshold(price) * 2);
     });
-    return !existingGoalToBuy && evolution.ownedStocks.length > 0;
+    return !existingGoalToBuy && evolution.ownedStocks.length > 1;
   }
 
   private isTooManyStocks(stocks) {
-    return stocks.length > 2;
+    return stocks.length >= this.stockPool;
   }
 
   private makeResolveGoalEvolution(price, evolution: Evolution) {
@@ -107,7 +127,19 @@ export class WebTickerEvolutionGenerator {
     let remainingCashflow = this.getCashflow(evolution.cashflow, goal, price);
     let actionDown = price - this.getThreshold(price);
     let actionUp = price + this.getThreshold(price);
+    if (this.hasMoreStocks(remainingStocks)){
+      let deletedGoals = remainingGoals.map((goal) => {
+        goal.status = 'deleted';
+        return goal;
+      });
+      return new Evolution(price, deletedGoals, remainingStocks, remainingCashflow, price, price);
+    }
     return new Evolution(price, remainingGoals, remainingStocks, remainingCashflow, actionUp, actionDown);
+  }
+
+  private hasMoreStocks(stocks){
+    let remainingStocks = stocks.filter((stock) => stock.status !== 'deleted');
+    return remainingStocks.length === 0;
   }
 
   private getCashflow(originalCash, goal, price) {
@@ -143,7 +175,14 @@ export class WebTickerEvolutionGenerator {
     if (this.isGoalSellButNoStock(completableGoal.isBuy, evolution.ownedStocks)) {
       return false;
     }
+    if (this.isGoalBuyButTooManyStocks(completableGoal.isBuy, evolution.ownedStocks)){
+      return false;
+    }
     return true;
+  }
+
+  private isGoalBuyButTooManyStocks(isBuy, stocks){
+    return isBuy && stocks.length >= this.stockPool;
   }
 
   private isGoalSellButNoStock(isBuy, stocks) {

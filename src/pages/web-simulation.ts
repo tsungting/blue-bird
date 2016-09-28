@@ -15,7 +15,13 @@ import {TickerActions} from '../actions/ticker.actions';
      <rio-container [size]=4 [center]=true>
       <div class="col col-12 center">
         <div>
-          <h2 class="inline-block caps">Simulate</h2> <input type="text" placeholder="Company Symbol" [(ngModel)]="symbol">
+          <h2 class="caps">Simulate</h2>
+          <span>Run simulation for </span>
+          <input type="text" placeholder="Symbol" [(ngModel)]="symbol">
+          <span> with a stock pool of </span>
+          <input type="text" placeholder="Stocks to Hold" [(ngModel)]="stockPool">
+          <span> and a action point of</span>
+          <input type="text" placeholder="Decimal Percentage" [(ngModel)]="actionPoint">
         </div>
         <button class="btn btn-primary" (click)="startWebTicker()">Start</button>
         <span *ngIf="isLoading">Loading...</span>
@@ -36,6 +42,8 @@ export class WebSimulationPage {
   private evolutions: Array<Evolution> = [];
   private isLoading : boolean = false;
   private symbol: string = '';
+  private actionPoint: string = '';
+  private stockPool: string = '';
   constructor(private tickerActions: TickerActions) {
   }
 
@@ -56,6 +64,6 @@ export class WebSimulationPage {
 
 
   public startWebTicker() {
-    this.tickerActions.getWebTicker(this.symbol);
+    this.tickerActions.getWebTicker(this.symbol, this.actionPoint, this.stockPool);
   }
 }
