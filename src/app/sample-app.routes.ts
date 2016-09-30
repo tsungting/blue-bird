@@ -1,6 +1,7 @@
 import {Routes} from '@angular/router';
 import {DashboardPage} from '../pages/dashboard.page';
 import {WebSimulationPage} from '../pages/web-simulation';
+import {WebAnalyzerPage} from '../pages/web-analyzer';
 import {
   RioCounterPage,
   RioAboutPage
@@ -22,4 +23,7 @@ export const SAMPLE_APP_ROUTES: Routes = [{
 }, {
   path: 'web',
   component: WebSimulationPage
+}, {
+  path: 'web-analyzer',
+  component: WebAnalyzerPage
 }];

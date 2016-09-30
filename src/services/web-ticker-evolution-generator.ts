@@ -7,13 +7,16 @@ export class WebTickerEvolutionGenerator {
   private actionPoint = 0.05;
   private stockPool = 3;
 
-  constructor(actionPoint = '0.05', stockPool = '3'){
+  constructor(actionPoint = '0.05', stockPool = '3') {
     this.actionPoint = parseFloat(actionPoint);
-    this.stockPool = parseInt(stockPool);
+    this.stockPool = parseInt(stockPool, 10);
   }
 
   public getEvolution(price, evolutions: Array<Evolution>) {
     let referenceEvolution = this.getReferenceEvolution(evolutions);
+    if (this.isStartOfTime(referenceEvolution)) {
+      return new Evolution(price, [], [], 0, price, price);
+    }
     if (this.canCompleteGoal(price, referenceEvolution)) {
       return this.makeResolveGoalEvolution(price, referenceEvolution);
     }
@@ -26,15 +29,19 @@ export class WebTickerEvolutionGenerator {
     return this.makeNoActionEvolution(price, referenceEvolution);
   }
 
-  private makeResetGoalEvolution(price, evolution){
+  private isStartOfTime(referenceEvolution) {
+    return !referenceEvolution;
+  }
+
+  private makeResetGoalEvolution(price, evolution) {
     let newGoals = evolution.goals.map((goal: Goal) => {
       goal.status = 'deleted';
       return goal;
-    })
+    });
     return new Evolution(price, newGoals, evolution.ownedStocks, evolution.cashflow, evolution.actionPointUp, evolution.actionPointDown);
   }
 
-  private shouldStartOver(price, referenceEvolution){
+  private shouldStartOver(price, referenceEvolution) {
     return referenceEvolution.ownedStocks.length === 0;
   }
 
@@ -127,17 +134,17 @@ export class WebTickerEvolutionGenerator {
     let remainingCashflow = this.getCashflow(evolution.cashflow, goal, price);
     let actionDown = price - this.getThreshold(price);
     let actionUp = price + this.getThreshold(price);
-    if (this.hasMoreStocks(remainingStocks)){
-      let deletedGoals = remainingGoals.map((goal) => {
-        goal.status = 'deleted';
-        return goal;
+    if (this.hasNoMoreStocks(remainingStocks)) {
+      let deletedGoals = remainingGoals.map((goalToDelete) => {
+        goalToDelete.status = 'deleted';
+        return goalToDelete;
       });
       return new Evolution(price, deletedGoals, remainingStocks, remainingCashflow, price, price);
     }
     return new Evolution(price, remainingGoals, remainingStocks, remainingCashflow, actionUp, actionDown);
   }
 
-  private hasMoreStocks(stocks){
+  private hasNoMoreStocks(stocks) {
     let remainingStocks = stocks.filter((stock) => stock.status !== 'deleted');
     return remainingStocks.length === 0;
   }
@@ -175,13 +182,13 @@ export class WebTickerEvolutionGenerator {
     if (this.isGoalSellButNoStock(completableGoal.isBuy, evolution.ownedStocks)) {
       return false;
     }
-    if (this.isGoalBuyButTooManyStocks(completableGoal.isBuy, evolution.ownedStocks)){
+    if (this.isGoalBuyButTooManyStocks(completableGoal.isBuy, evolution.ownedStocks)) {
       return false;
     }
     return true;
   }
 
-  private isGoalBuyButTooManyStocks(isBuy, stocks){
+  private isGoalBuyButTooManyStocks(isBuy, stocks) {
     return isBuy && stocks.length >= this.stockPool;
   }
 

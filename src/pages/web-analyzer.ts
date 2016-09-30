@@ -9,7 +9,7 @@ import * as Rx from 'rxjs/Rx';
 import {TickerActions} from '../actions/ticker.actions';
 
 @Component({
-  selector: 'bb-web-simulation-page',
+  selector: 'bb-web-analyzer-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
      <rio-container [size]=4 [center]=true>
@@ -23,7 +23,7 @@ import {TickerActions} from '../actions/ticker.actions';
           <span> and a action point of</span>
           <input type="text" placeholder="Decimal Percentage" [(ngModel)]="actionPoint">
         </div>
-        <button class="btn btn-primary" (click)="startWebTicker()">Start</button>
+        <button class="btn btn-primary" (click)="analyzeStock()">Analyze</button>
         <span *ngIf="isLoading">Loading...</span>
       </div>
       <bb-label title="Current Ticker" [content]="ticker$ | async"></bb-label>
@@ -34,16 +34,16 @@ import {TickerActions} from '../actions/ticker.actions';
     </rio-container>
   `
 })
-export class WebSimulationPage {
+export class WebAnalyzerPage {
   @select(state => state.ticker.get('currentTicker')) private ticker$;
   @select(state => state.ticker.get('webEvolutions')) private evolutions$;
   @select(state => state.ticker.get('webApiStatus')) private webApiStatus$;
 
   private evolutions: Array<Evolution> = [];
   private isLoading : boolean = false;
-  private symbol: string = 'FB';
-  private actionPoint: string = '0.03';
-  private stockPool: string = '3';
+  private symbol: string = '';
+  private actionPoint: string = '';
+  private stockPool: string = '';
   constructor(private tickerActions: TickerActions) {
   }
 
@@ -63,7 +63,7 @@ export class WebSimulationPage {
   }
 
 
-  public startWebTicker() {
-    this.tickerActions.getWebTicker(this.symbol, this.actionPoint, this.stockPool);
+  public analyzeStock() {
+    this.tickerActions.analyzeStock(this.symbol, this.actionPoint, this.stockPool);
   }
 }

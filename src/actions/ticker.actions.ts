@@ -4,6 +4,7 @@ import { IAppState } from '../store';
 import {TickerApi} from '../services/ticker-api';
 import {Goal} from '../types/goal';
 import {Evolution} from '../types/evolution';
+import {AnalysisResult} from '../types/analysis-result';
 
 import {RandomTickerEvolutionGenerator} from '../services/random-ticker-evolution-generator';
 import {WebTickerEvolutionGenerator} from '../services/web-ticker-evolution-generator';
@@ -48,6 +49,52 @@ export class TickerActions {
         }
         this.dispatchTicker(ticker);
       });
+  }
+
+  public analyzeStock(symbol = 'FB', actionPoint = '0.05', stockPool = '3') {
+    this.ngRedux.dispatch({
+      type: TickerActions.WEB_REQUEST_STARTED,
+      payload: {symbol: symbol}
+    });
+    this.tickerApi.fetchFullHistoryFor(symbol)
+      .subscribe((tickers) => {
+        let generator = new WebTickerEvolutionGenerator(actionPoint, stockPool);
+        let evolutions = tickers.reduce((currentEvolutions, ticker) => {
+          let newEvolution = generator.getEvolution(ticker, currentEvolutions);
+          return currentEvolutions.concat(JSON.parse(JSON.stringify(newEvolution)));
+        }, []);
+        console.log('year of tickers', evolutions);
+        let result: AnalysisResult = this.analyzeEvolutions(evolutions);
+        console.log('result', result);
+      });
+  }
+
+  private analyzeEvolutions(evolutions) {
+    let daysInPeriod = evolutions.length;
+    let result: AnalysisResult = evolutions.reduce((currentResult: AnalysisResult, evolution: Evolution) => {
+      if (evolution.profit > currentResult.maximumProfit) {
+        currentResult.maximumProfit = evolution.profit;
+      }
+      if (evolution.profit < currentResult.minimumProfit) {
+        currentResult.minimumProfit = evolution.profit;
+      }
+      if (evolution.cashflow < currentResult.minimumCashflow) {
+        currentResult.minimumCashflow = evolution.cashflow;
+      }
+      currentResult.averageStockHeld += this.getRemainingStocks(evolution.ownedStocks) / daysInPeriod;
+      return currentResult;
+    }, new AnalysisResult());
+    let finalEvolution = evolutions[evolutions.length - 1];
+    result.endProfit = finalEvolution.profit;
+    result.startPrice = evolutions[0].price;
+    result.endPrice = finalEvolution.price;
+    result.percentageGain = result.endProfit / (evolutions[0].price * result.averageStockHeld);
+    result.referenceGain = (finalEvolution.price - evolutions[0].price) / evolutions[0].price;
+    return result;
+  }
+
+  private getRemainingStocks(stocks) {
+    return stocks.filter((stock) => stock.status !== 'deleted').length;
   }
 
   private dispatchEvolution(evolution, name) {

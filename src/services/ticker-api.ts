@@ -38,7 +38,6 @@ export class TickerApi {
   }
 
   public fetchHistoryFor(symbol) {
-    // "https://www.quandl.com/api/v3/datasets/WIKI/FB.json?column_index=4&start_date=2014-01-01&end_date=2014-12-31&collapse=monthly&transform=diff&api_key=YOURAPIKEY"
     let headers = new Headers();
     headers.append('Access-Control-Allow-Origin', '*');
     return this.http.get(`https://www.quandl.com/api/v3/datasets/WIKI/${symbol}.json?api_key=9__kYHwVh4nsuTsQTSNF&start_date=2015-01-01&end_date=2015-12-31`, {
@@ -47,6 +46,23 @@ export class TickerApi {
       .map((result) => result.json())
       .flatMap((result) => this.splitEachDataPoint(result));
 
+  }
+
+  public fetchFullHistoryFor(symbol) {
+    let headers = new Headers();
+    headers.append('Access-Control-Allow-Origin', '*');
+    return this.http.get(`https://www.quandl.com/api/v3/datasets/WIKI/${symbol}.json?api_key=9__kYHwVh4nsuTsQTSNF&start_date=2015-01-01&end_date=2015-12-31`, {
+      headers: headers
+    })
+      .map((result) => result.json())
+      .map((result) => {
+        let dateIndex = result.dataset.column_names.indexOf('Date');
+        result.dataset.data.sort(this.sortByDate(dateIndex));
+        let closingPriceIndex = result.dataset.column_names.indexOf('Close');
+        return result.dataset.data.map((data) => {
+          return data[closingPriceIndex];
+        });
+      });
   }
 
   private splitEachDataPoint(result) {
