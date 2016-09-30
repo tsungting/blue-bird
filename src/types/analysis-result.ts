@@ -1,3 +1,4 @@
+import {AlgorithmParameters} from './algorithm-parameters';
 
 export class AnalysisResult {
 
@@ -10,6 +11,7 @@ export class AnalysisResult {
   public startPrice : number = 0;
   public endPrice : number = 0;
   public averageStockHeld : number = 0;
+  public queryInfo : AlgorithmParameters = new AlgorithmParameters();
 
   constructor(minimumCashflow = 0, minimumProfit = 0, maximumProfit = 0, endProfit = 0, percentageGain = 0, referenceGain = 0) {
     this.minimumCashflow = minimumCashflow;

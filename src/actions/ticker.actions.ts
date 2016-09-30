@@ -4,6 +4,7 @@ import { IAppState } from '../store';
 import {TickerApi} from '../services/ticker-api';
 import {Goal} from '../types/goal';
 import {Evolution} from '../types/evolution';
+import {AlgorithmParameters} from '../types/algorithm-parameters';
 import {AnalysisResult} from '../types/analysis-result';
 
 import {RandomTickerEvolutionGenerator} from '../services/random-ticker-evolution-generator';
@@ -15,6 +16,7 @@ export class TickerActions {
   static NEW_EVOLUTION_CREATED = 'NEW_EVOLUTION_CREATED';
   static WEB_REQUEST_STARTED = 'WEB_REQUEST_STARTED';
   static NEW_WEB_EVOLUTION_CREATED = 'NEW_WEB_EVOLUTION_CREATED';
+  static NEW_ANALYSIS_RESULT_CREATED = 'NEW_ANALYSIS_RESULT_CREATED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private tickerApi: TickerApi) {
@@ -28,7 +30,7 @@ export class TickerActions {
         let generator = new RandomTickerEvolutionGenerator();
         let evolution = generator.getEvolution(ticker, state.ticker.get('evolutions').toJS());
         if (evolution) {
-          this.dispatchEvolution(evolution, TickerActions.NEW_EVOLUTION_CREATED);
+          this.dispatch(evolution, TickerActions.NEW_EVOLUTION_CREATED);
         }
         this.dispatchTicker(ticker);
       });
@@ -45,7 +47,7 @@ export class TickerActions {
         let generator = new WebTickerEvolutionGenerator(actionPoint, stockPool);
         let evolution = generator.getEvolution(ticker, state.ticker.get('webEvolutions').toJS());
         if (evolution) {
-          this.dispatchEvolution(evolution, TickerActions.NEW_WEB_EVOLUTION_CREATED);
+          this.dispatch(evolution, TickerActions.NEW_WEB_EVOLUTION_CREATED);
         }
         this.dispatchTicker(ticker);
       });
@@ -65,8 +67,14 @@ export class TickerActions {
         }, []);
         console.log('year of tickers', evolutions);
         let result: AnalysisResult = this.analyzeEvolutions(evolutions);
+        result.queryInfo = this.getQueryInfo(symbol, actionPoint, stockPool);
         console.log('result', result);
+        this.dispatch(result, TickerActions.NEW_ANALYSIS_RESULT_CREATED);
       });
+  }
+
+  private getQueryInfo(symbol, actionPoint, stockPool){
+    return new AlgorithmParameters(symbol, stockPool, actionPoint);
   }
 
   private analyzeEvolutions(evolutions) {
@@ -97,7 +105,7 @@ export class TickerActions {
     return stocks.filter((stock) => stock.status !== 'deleted').length;
   }
 
-  private dispatchEvolution(evolution, name) {
+  private dispatch(evolution, name) {
     this.ngRedux.dispatch({
       type: name,
       payload: evolution

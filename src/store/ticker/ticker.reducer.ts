@@ -6,11 +6,12 @@ import * as Immutable from 'immutable';
 export const INITIAL_STATE = Immutable.fromJS({
   currentTicker: 10,
   evolutions: [JSON.parse(JSON.stringify(new Evolution()))],
-  webEvolutions: []
+  webEvolutions: [],
+  stockAnalysisResult: []
 });
 
 export function tickerReducer(state = INITIAL_STATE,
-                              action) {
+                              action: any = {}) {
 
   switch (action.type) {
 
@@ -21,6 +22,9 @@ export function tickerReducer(state = INITIAL_STATE,
     case TickerActions.NEW_WEB_EVOLUTION_CREATED:
       state = state.set('webApiStatus', 'Success');
       return state.update('webEvolutions', (evolutions) => evolutions.push(action.payload));
+    case TickerActions.NEW_ANALYSIS_RESULT_CREATED:
+      state = state.set('webApiStatus', 'Success');
+      return state.update('stockAnalysisResult', (results) => results.push(action.payload));
     case TickerActions.WEB_REQUEST_STARTED:
       return state.set('webApiStatus', 'Loading');
     default:
