@@ -27,6 +27,8 @@ export function tickerReducer(state = INITIAL_STATE,
       return state.update('stockAnalysisResult', (results) => results.push(action.payload));
     case TickerActions.WEB_REQUEST_STARTED:
       return state.set('webApiStatus', 'Loading');
+    case TickerActions.NOT_FOUND_RECEIVED:
+      return state.set('webApiStatus', 'Not Found');
     default:
       return state;
   }

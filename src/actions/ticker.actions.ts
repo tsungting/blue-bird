@@ -17,6 +17,7 @@ export class TickerActions {
   static WEB_REQUEST_STARTED = 'WEB_REQUEST_STARTED';
   static NEW_WEB_EVOLUTION_CREATED = 'NEW_WEB_EVOLUTION_CREATED';
   static NEW_ANALYSIS_RESULT_CREATED = 'NEW_ANALYSIS_RESULT_CREATED';
+  static NOT_FOUND_RECEIVED = 'NOT_FOUND_RECEIVED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private tickerApi: TickerApi) {
@@ -65,15 +66,17 @@ export class TickerActions {
           let newEvolution = generator.getEvolution(ticker, currentEvolutions);
           return currentEvolutions.concat(JSON.parse(JSON.stringify(newEvolution)));
         }, []);
-        console.log('year of tickers', evolutions);
         let result: AnalysisResult = this.analyzeEvolutions(evolutions);
         result.queryInfo = this.getQueryInfo(symbol, actionPoint, stockPool);
-        console.log('result', result);
         this.dispatch(result, TickerActions.NEW_ANALYSIS_RESULT_CREATED);
+      }, (error) => {
+        if (error.status === 404) {
+          this.dispatch(error, TickerActions.NOT_FOUND_RECEIVED);
+        }
       });
   }
 
-  private getQueryInfo(symbol, actionPoint, stockPool){
+  private getQueryInfo(symbol, actionPoint, stockPool) {
     return new AlgorithmParameters(symbol, stockPool, actionPoint);
   }
 

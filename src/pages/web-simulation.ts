@@ -58,7 +58,6 @@ export class WebSimulationPage {
     this.webApiStatus$
       .filter((value) => value)
       .subscribe((status) => {
-        debugger;
         this.isLoading = status === 'Loading';
       });
   }
