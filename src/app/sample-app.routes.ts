@@ -2,6 +2,8 @@ import {Routes} from '@angular/router';
 import {DashboardPage} from '../pages/dashboard.page';
 import {WebSimulationPage} from '../pages/web-simulation';
 import {WebAnalyzerPage} from '../pages/web-analyzer';
+import {MultiStockAnalyzer} from '../pages/multi-stock-analyzer';
+
 import {
   RioCounterPage,
   RioAboutPage
@@ -10,7 +12,7 @@ import {
 export const SAMPLE_APP_ROUTES: Routes = [{
   pathMatch: 'full',
   path: '',
-  redirectTo: 'counter'
+  redirectTo: 'web-analyzer'
 }, {
   path: 'counter',
   component: RioCounterPage
@@ -26,4 +28,7 @@ export const SAMPLE_APP_ROUTES: Routes = [{
 }, {
   path: 'web-analyzer',
   component: WebAnalyzerPage
+}, {
+  path: 'multi-stock-analyzer',
+  component: MultiStockAnalyzer
 }];

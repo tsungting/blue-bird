@@ -27,6 +27,7 @@ import {
 import {DashboardPage} from '../pages/dashboard.page';
 import {WebSimulationPage} from '../pages/web-simulation';
 import {WebAnalyzerPage} from '../pages/web-analyzer';
+import {MultiStockAnalyzer} from '../pages/multi-stock-analyzer';
 import {RioCounter} from '../components/counter/counter.component';
 import {RioLoginModule} from '../components/login/login.module';
 import {RioUiModule} from '../components/ui/ui.module';
@@ -50,6 +51,7 @@ import {RioNavigatorModule} from '../components/navigator/navigator.module';
     DashboardPage,
     WebSimulationPage,
     WebAnalyzerPage,
+    MultiStockAnalyzer,
     RioCounter
   ],
   bootstrap: [
