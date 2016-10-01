@@ -64,6 +64,6 @@ export class WebSimulationPage {
 
 
   public startWebTicker() {
-    this.tickerActions.getWebTicker(this.symbol, this.actionPoint, this.stockPool);
+    this.tickerActions.getWebEvolutions(this.symbol, this.actionPoint, this.stockPool);
   }
 }

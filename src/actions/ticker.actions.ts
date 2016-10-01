@@ -37,7 +37,7 @@ export class TickerActions {
       });
   }
 
-  public getWebTicker(symbol = 'FB', actionPoint = '0.05', stockPool = '3') {
+  public getWebEvolutions(symbol = 'FB', actionPoint = '0.05', stockPool = '3') {
     this.ngRedux.dispatch({
       type: TickerActions.WEB_REQUEST_STARTED,
       payload: {symbol: symbol}
@@ -55,25 +55,28 @@ export class TickerActions {
   }
 
   public analyzeStock(symbol = 'FB', actionPoint = '0.05', stockPool = '3') {
-    this.ngRedux.dispatch({
-      type: TickerActions.WEB_REQUEST_STARTED,
-      payload: {symbol: symbol}
-    });
+    this.dispatch({symbol: symbol}, TickerActions.WEB_REQUEST_STARTED);
     this.tickerApi.fetchFullHistoryFor(symbol)
       .subscribe((tickers) => {
-        let generator = new WebTickerEvolutionGenerator(actionPoint, stockPool);
-        let evolutions = tickers.reduce((currentEvolutions, ticker) => {
-          let newEvolution = generator.getEvolution(ticker, currentEvolutions);
-          return currentEvolutions.concat(JSON.parse(JSON.stringify(newEvolution)));
-        }, []);
-        let result: AnalysisResult = this.analyzeEvolutions(evolutions);
-        result.queryInfo = this.getQueryInfo(symbol, actionPoint, stockPool);
+        let queryInfo = this.getQueryInfo(symbol, actionPoint, stockPool);
+        let result = this.analyzeSingleStock(tickers, queryInfo);
         this.dispatch(result, TickerActions.NEW_ANALYSIS_RESULT_CREATED);
       }, (error) => {
         if (error.status === 404) {
           this.dispatch(error, TickerActions.NOT_FOUND_RECEIVED);
         }
       });
+  }
+
+  private analyzeSingleStock(tickers, queryInfo: AlgorithmParameters) {
+    let generator = new WebTickerEvolutionGenerator(queryInfo.actionPoint.toString(), queryInfo.pool.toString());
+    let evolutions = tickers.reduce((currentEvolutions, ticker) => {
+      let newEvolution = generator.getEvolution(ticker, currentEvolutions);
+      return currentEvolutions.concat(JSON.parse(JSON.stringify(newEvolution)));
+    }, []);
+    let result: AnalysisResult = this.analyzeEvolutions(evolutions);
+    result.queryInfo = queryInfo;
+    return result;
   }
 
   private getQueryInfo(symbol, actionPoint, stockPool) {
