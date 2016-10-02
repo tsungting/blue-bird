@@ -49,10 +49,9 @@ export class TickerApi {
   }
 
   public fetchFullHistoryFor(symbol) {
-    let headers = new Headers();
-    headers.append('Access-Control-Allow-Origin', '*');
+
     return this.http.get(`https://www.quandl.com/api/v3/datasets/WIKI/${symbol}.json?api_key=9__kYHwVh4nsuTsQTSNF&start_date=2015-01-01&end_date=2015-12-31`, {
-      headers: headers
+      headers: this.getHeaders()
     })
       .map((result) => result.json())
       .map((result) => {
@@ -63,6 +62,35 @@ export class TickerApi {
           return data[closingPriceIndex];
         });
       });
+  }
+
+  public fetchMultiStockHistory() {
+    return this.http.get(`https://www.quandl.com/api/v3/datasets.json?database_code=WIKI&per_page=100&sort_by=id&page=1&api_key=9__kYHwVh4nsuTsQTSNF`, {
+      headers: this.getHeaders()
+    })
+      .map((result) => result.json())
+      .map((result) => {
+        return result.datasets.map((symbolObject) => {
+          let symbol = symbolObject.dataset_code;
+          return this.fetchFullHistoryFor(symbol);
+        });
+      })
+      .flatMap((requests) => {
+        return Observable.forkJoin(requests);
+      });
+
+  }
+
+  private getRequestToGet(symbol) {
+    return this.http.get(`https://www.quandl.com/api/v3/datasets/WIKI/${symbol}.json?api_key=9__kYHwVh4nsuTsQTSNF&start_date=2015-01-01&end_date=2015-12-31`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  private getHeaders() {
+    let headers = new Headers();
+    headers.append('Access-Control-Allow-Origin', '*');
+    return headers;
   }
 
   private splitEachDataPoint(result) {

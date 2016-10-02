@@ -18,6 +18,7 @@ export class TickerActions {
   static NEW_WEB_EVOLUTION_CREATED = 'NEW_WEB_EVOLUTION_CREATED';
   static NEW_ANALYSIS_RESULT_CREATED = 'NEW_ANALYSIS_RESULT_CREATED';
   static NOT_FOUND_RECEIVED = 'NOT_FOUND_RECEIVED';
+  static MULTI_STOCK_ANALYSIS_RESULT_CREATED = 'MULTI_STOCK_ANALYSIS_RESULT_CREATED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private tickerApi: TickerApi) {
@@ -68,9 +69,31 @@ export class TickerActions {
       });
   }
 
-  private analyzeSingleStock(tickers, queryInfo: AlgorithmParameters) {
+  public analyzeMultiStock(actionPoint, stockPool) {
+    this.dispatch({}, TickerActions.WEB_REQUEST_STARTED);
+    this.tickerApi.fetchMultiStockHistory()
+      .subscribe((tickerPrices: Array<any>) => {
+        let results = tickerPrices.map((singleTickerPrices) => {
+          return this.analyzeSingleStock(singleTickerPrices, new AlgorithmParameters('N/A', stockPool, actionPoint));
+        })
+          .filter((result) => result);
+        let averagedResults = results.reduce((currentAverage: AnalysisResult, result: AnalysisResult) => {
+          currentAverage.averageStockHeld += result.averageStockHeld / results.length;
+          currentAverage.referenceGain += result.referenceGain / results.length;
+          currentAverage.percentageGain += result.percentageGain / results.length;
+          return currentAverage;
+        }, new AnalysisResult());
+        averagedResults.queryInfo = new AlgorithmParameters('N/A', stockPool, actionPoint);
+        this.dispatch(averagedResults, TickerActions.MULTI_STOCK_ANALYSIS_RESULT_CREATED);
+      });
+  }
+
+  private analyzeSingleStock(prices, queryInfo: AlgorithmParameters) {
+    if (!prices.length) {
+      return;
+    }
     let generator = new WebTickerEvolutionGenerator(queryInfo.actionPoint.toString(), queryInfo.pool.toString());
-    let evolutions = tickers.reduce((currentEvolutions, ticker) => {
+    let evolutions = prices.reduce((currentEvolutions, ticker) => {
       let newEvolution = generator.getEvolution(ticker, currentEvolutions);
       return currentEvolutions.concat(JSON.parse(JSON.stringify(newEvolution)));
     }, []);
@@ -85,6 +108,9 @@ export class TickerActions {
 
   private analyzeEvolutions(evolutions) {
     let daysInPeriod = evolutions.length;
+    if (daysInPeriod === 0) {
+      return;
+    }
     let result: AnalysisResult = evolutions.reduce((currentResult: AnalysisResult, evolution: Evolution) => {
       if (evolution.profit > currentResult.maximumProfit) {
         currentResult.maximumProfit = evolution.profit;

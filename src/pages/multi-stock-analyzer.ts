@@ -63,7 +63,7 @@ import {TickerActions} from '../actions/ticker.actions';
   `
 })
 export class MultiStockAnalyzer {
-  @select(state => state.ticker.get('stockAnalysisResult')) private analysisResult$;
+  @select(state => state.ticker.get('multiStockAnalysisResult')) private analysisResult$;
   @select(state => state.ticker.get('webApiStatus')) private webApiStatus$;
 
   private isLoading: boolean = false;
@@ -101,6 +101,6 @@ export class MultiStockAnalyzer {
   }
 
   public analyzeStock() {
-    this.tickerActions.analyzeStock(this.symbol, this.actionPoint, this.stockPool);
+    this.tickerActions.analyzeMultiStock(this.actionPoint, this.stockPool);
   }
 }
