@@ -8,7 +8,8 @@ export const INITIAL_STATE = Immutable.fromJS({
   evolutions: [JSON.parse(JSON.stringify(new Evolution()))],
   webEvolutions: [],
   stockAnalysisResult: [],
-  multiStockAnalysisResult: []
+  multiStockAnalysisResult: [],
+  stockList: {}
 });
 
 export function tickerReducer(state = INITIAL_STATE,
@@ -20,6 +21,8 @@ export function tickerReducer(state = INITIAL_STATE,
       return state.set('currentTicker', action.payload);
     case TickerActions.NEW_EVOLUTION_CREATED:
       return state.update('evolutions', (evolutions) => evolutions.push(action.payload));
+    case TickerActions.NEW_STOCK_LIST_CREATED:
+      return state.setIn(['stockList', action.payload.get('page')], action.payload.get('list'));
     case TickerActions.NEW_WEB_EVOLUTION_CREATED:
       state = state.set('webApiStatus', 'Success');
       return state.update('webEvolutions', (evolutions) => evolutions.push(action.payload));

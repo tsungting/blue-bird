@@ -19,6 +19,7 @@ export class TickerActions {
   static NEW_ANALYSIS_RESULT_CREATED = 'NEW_ANALYSIS_RESULT_CREATED';
   static NOT_FOUND_RECEIVED = 'NOT_FOUND_RECEIVED';
   static MULTI_STOCK_ANALYSIS_RESULT_CREATED = 'MULTI_STOCK_ANALYSIS_RESULT_CREATED';
+  static NEW_STOCK_LIST_CREATED = 'NEW_STOCK_LIST_CREATED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private tickerApi: TickerApi) {
@@ -69,9 +70,9 @@ export class TickerActions {
       });
   }
 
-  public analyzeMultiStock(actionPoint, stockPool) {
+  public analyzeMultiStock(page = '1', actionPoint, stockPool) {
     this.dispatch({}, TickerActions.WEB_REQUEST_STARTED);
-    this.tickerApi.fetchMultiStockHistory()
+    this.fetchMultiStockHistory(page)
       .subscribe((tickerPrices: Array<any>) => {
         let results = tickerPrices.map((singleTickerPrices) => {
           return this.analyzeSingleStock(singleTickerPrices, new AlgorithmParameters('N/A', stockPool, actionPoint));
@@ -86,6 +87,21 @@ export class TickerActions {
         averagedResults.queryInfo = new AlgorithmParameters('N/A', stockPool, actionPoint);
         this.dispatch(averagedResults, TickerActions.MULTI_STOCK_ANALYSIS_RESULT_CREATED);
       });
+  }
+
+  // Doing this optimization changes load from 16s to 10s
+  private fetchMultiStockHistory(page = '1') {
+    let state = this.ngRedux.getState();
+    let stockListInStore = state.ticker.getIn(['stockList', page]);
+    if (!stockListInStore) {
+      return this.tickerApi.fetchStockList(page)
+        .flatMap((list) => {
+          this.dispatch({page: page, list: list}, TickerActions.NEW_STOCK_LIST_CREATED);
+          return this.tickerApi.fetchStockForSymbols(list);
+        });
+    }
+    return this.tickerApi.fetchStockForSymbols(stockListInStore.toJS());
+
   }
 
   private analyzeSingleStock(prices, queryInfo: AlgorithmParameters) {
@@ -129,6 +145,9 @@ export class TickerActions {
     result.startPrice = evolutions[0].price;
     result.endPrice = finalEvolution.price;
     result.percentageGain = result.endProfit / (evolutions[0].price * result.averageStockHeld);
+    if (isNaN(result.percentageGain)) {
+      result.percentageGain = 0;
+    }
     result.referenceGain = (finalEvolution.price - evolutions[0].price) / evolutions[0].price;
     return result;
   }

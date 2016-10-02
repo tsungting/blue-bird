@@ -46,8 +46,8 @@ import {TickerActions} from '../actions/ticker.actions';
             </div>
           </div>
           <footer class="absolute bottom-0 m3">
-            <span>Run simulation for </span>
-            <input type="text" placeholder="Symbol" [(ngModel)]="symbol">
+            <span>Run simulation for Dataset #</span>
+            <input type="text" placeholder="Data set" [(ngModel)]="dataSetNumber">
             <span> with a stock pool of </span>
             <input type="text" placeholder="Stocks to Hold" [(ngModel)]="stockPool">
             <span> and a action point of</span>
@@ -67,7 +67,7 @@ export class MultiStockAnalyzer {
   @select(state => state.ticker.get('webApiStatus')) private webApiStatus$;
 
   private isLoading: boolean = false;
-  private symbol: string = 'FB';
+  private dataSetNumber: string = '1';
   private actionPoint: string = '0.01';
   private stockPool: string = '3';
   private results: Array<AnalysisResult> = [];
@@ -101,6 +101,6 @@ export class MultiStockAnalyzer {
   }
 
   public analyzeStock() {
-    this.tickerActions.analyzeMultiStock(this.actionPoint, this.stockPool);
+    this.tickerActions.analyzeMultiStock(this.dataSetNumber, this.actionPoint, this.stockPool);
   }
 }

@@ -38,11 +38,7 @@ export class TickerApi {
   }
 
   public fetchHistoryFor(symbol) {
-    let headers = new Headers();
-    headers.append('Access-Control-Allow-Origin', '*');
-    return this.http.get(`https://www.quandl.com/api/v3/datasets/WIKI/${symbol}.json?api_key=9__kYHwVh4nsuTsQTSNF&start_date=2015-01-01&end_date=2015-12-31`, {
-      headers: headers
-    })
+    return this.getRequestToGet(symbol)
       .map((result) => result.json())
       .flatMap((result) => this.splitEachDataPoint(result));
 
@@ -50,9 +46,7 @@ export class TickerApi {
 
   public fetchFullHistoryFor(symbol) {
 
-    return this.http.get(`https://www.quandl.com/api/v3/datasets/WIKI/${symbol}.json?api_key=9__kYHwVh4nsuTsQTSNF&start_date=2015-01-01&end_date=2015-12-31`, {
-      headers: this.getHeaders()
-    })
+    return this.getRequestToGet(symbol)
       .map((result) => result.json())
       .map((result) => {
         let dateIndex = result.dataset.column_names.indexOf('Date');
@@ -64,21 +58,21 @@ export class TickerApi {
       });
   }
 
-  public fetchMultiStockHistory() {
-    return this.http.get(`https://www.quandl.com/api/v3/datasets.json?database_code=WIKI&per_page=100&sort_by=id&page=1&api_key=9__kYHwVh4nsuTsQTSNF`, {
+  public fetchStockList(page = '1') {
+    return this.http.get(`https://www.quandl.com/api/v3/datasets.json?database_code=WIKI&per_page=100&sort_by=id&page=${page}&api_key=9__kYHwVh4nsuTsQTSNF`, {
       headers: this.getHeaders()
     })
       .map((result) => result.json())
       .map((result) => {
         return result.datasets.map((symbolObject) => {
-          let symbol = symbolObject.dataset_code;
-          return this.fetchFullHistoryFor(symbol);
+          return symbolObject.dataset_code;
         });
-      })
-      .flatMap((requests) => {
-        return Observable.forkJoin(requests);
       });
+  }
 
+  public fetchStockForSymbols(symbols: Array<string>) {
+    let requests = symbols.map((symbol) => this.fetchFullHistoryFor(symbol));
+    return Observable.forkJoin(requests);
   }
 
   private getRequestToGet(symbol) {
