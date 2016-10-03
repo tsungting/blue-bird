@@ -5,6 +5,7 @@ import {TickerApi} from '../services/ticker-api';
 import {Goal} from '../types/goal';
 import {Evolution} from '../types/evolution';
 import {AlgorithmParameters} from '../types/algorithm-parameters';
+import {AnalysisAggregate} from '../types/analysis-aggregate';
 import {AnalysisResult} from '../types/analysis-result';
 
 import {RandomTickerEvolutionGenerator} from '../services/random-ticker-evolution-generator';
@@ -70,7 +71,7 @@ export class TickerActions {
       });
   }
 
-  public analyzeMultiStock(page = '1', actionPoint, stockPool) {
+  public analyzeMultiStock(page = '1', actionPoint = 0.01, stockPool = 3) {
     this.dispatch({}, TickerActions.WEB_REQUEST_STARTED);
     this.fetchMultiStockHistory(page)
       .subscribe((tickerPrices: Array<any>) => {
@@ -78,13 +79,15 @@ export class TickerActions {
           return this.analyzeSingleStock(singleTickerPrices, new AlgorithmParameters('N/A', stockPool, actionPoint));
         })
           .filter((result) => result);
-        let averagedResults = results.reduce((currentAverage: AnalysisResult, result: AnalysisResult) => {
+        let averagedResults = results.reduce((currentAverage: AnalysisAggregate, result: AnalysisResult) => {
           currentAverage.averageStockHeld += result.averageStockHeld / results.length;
           currentAverage.referenceGain += result.referenceGain / results.length;
           currentAverage.percentageGain += result.percentageGain / results.length;
+          currentAverage.totalStocksAnalyzed += 1;
+          currentAverage.totalWinOverReference += result.percentageGain > result.referenceGain ? 1 : 0;
           return currentAverage;
-        }, new AnalysisResult());
-        averagedResults.queryInfo = new AlgorithmParameters('N/A', stockPool, actionPoint);
+        }, new AnalysisAggregate());
+        averagedResults.queryInfo = new AlgorithmParameters('N/A', stockPool, actionPoint, page);
         this.dispatch(averagedResults, TickerActions.MULTI_STOCK_ANALYSIS_RESULT_CREATED);
       });
   }

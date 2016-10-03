@@ -4,7 +4,7 @@ import { select } from 'ng2-redux';
 import { Observable } from 'rxjs/Observable';
 
 import {Evolution} from '../types/evolution';
-import {AnalysisResult} from '../types/analysis-result';
+import {AnalysisAggregate} from '../types/analysis-aggregate';
 import {Goal} from '../types/goal';
 import * as Rx from 'rxjs/Rx';
 import {TickerActions} from '../actions/ticker.actions';
@@ -22,7 +22,7 @@ import {TickerActions} from '../actions/ticker.actions';
               <div class="overflow-hidden border rounded m2">
                 <div class="p1 clearfix bold white bg-blue">
                   <div class="col col-3">
-                    {{result.queryInfo.symbol}}
+                    {{result.queryInfo.datasetNumber}}
                   </div>
                   <div class="col col-3">
                     Pool Depth: {{result.queryInfo.pool}}
@@ -33,12 +33,8 @@ import {TickerActions} from '../actions/ticker.actions';
                 </div>
                 <div class="p2">
                   <div class="col col-3"><bb-label title="Avg Stock Held" [content]="result.averageStockHeld"></bb-label></div>
-                  <div class="col col-3"><bb-label title="Start Price" [content]="formatCurrency(result.startPrice)"></bb-label></div>
-                  <div class="col col-3"><bb-label title="Maximum Profit" [content]="formatCurrency(result.maximumProfit)"></bb-label></div>
-                  <div class="col col-3"><bb-label title="End Profit" [content]="formatCurrency(result.endProfit)"></bb-label></div>
-                  <div class="col col-3"><bb-label title="Minimum Cashflow" [content]="formatCurrency(result.minimumCashflow)"></bb-label></div>
-                  <div class="col col-3"><bb-label title="End Price" [content]="formatCurrency(result.endPrice)"></bb-label></div>
-                  <div class="col col-3"><bb-label title="Minimum Profit" [content]="formatCurrency(result.minimumProfit)"></bb-label></div>
+                  <div class="col col-3"><bb-label title="Stock Analyzed" [content]="result.totalStocksAnalyzed"></bb-label></div>
+                  <div class="col col-3"><bb-label title="Wins Over Reference" [content]="getWinMessage(result)"></bb-label></div>
                   <div class="col col-3"><bb-label title="Algorithm VS Reference" [content]="getPercentageGain(result)"></bb-label></div>
                 </div>
               </div>
@@ -70,7 +66,7 @@ export class MultiStockAnalyzer {
   private dataSetNumber: string = '1';
   private actionPoint: string = '0.01';
   private stockPool: string = '3';
-  private results: Array<AnalysisResult> = [];
+  private results: Array<AnalysisAggregate> = [];
   private status : string = '';
 
   constructor(private tickerActions: TickerActions) {
@@ -92,7 +88,7 @@ export class MultiStockAnalyzer {
       });
   }
 
-  private getPercentageGain(result: AnalysisResult) {
+  private getPercentageGain(result: AnalysisAggregate) {
     return `${(result.percentageGain * 100).toFixed(2)}% vs ${(result.referenceGain * 100).toFixed(2)}% `;
   }
 
@@ -101,6 +97,10 @@ export class MultiStockAnalyzer {
   }
 
   public analyzeStock() {
-    this.tickerActions.analyzeMultiStock(this.dataSetNumber, this.actionPoint, this.stockPool);
+    this.tickerActions.analyzeMultiStock(this.dataSetNumber, parseFloat(this.actionPoint), parseInt(this.stockPool, 10));
+  }
+
+  private getWinMessage(result: AnalysisAggregate) {
+    return `${result.totalWinOverReference} (${(result.totalWinOverReference * 100 / result.totalStocksAnalyzed).toFixed(2)}%)`;
   }
 }
