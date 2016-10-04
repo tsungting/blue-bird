@@ -16,13 +16,13 @@ import {TickerActions} from '../actions/ticker.actions';
       <div class="col col-12 center">
         <div>
           <div style="max-height:75vh; overflow:scroll">
-            <h2 class="caps">Simulate</h2>
+            <h2 class="caps">Run 100 Stocks at Once</h2>
 
             <div *ngFor="let result of results">
               <div class="overflow-hidden border rounded m2">
                 <div class="p1 clearfix bold white bg-blue">
                   <div class="col col-3">
-                    {{result.queryInfo.datasetNumber}}
+                    Data Set # {{result.queryInfo.datasetNumber}}
                   </div>
                   <div class="col col-3">
                     Pool Depth: {{result.queryInfo.pool}}
@@ -48,7 +48,7 @@ import {TickerActions} from '../actions/ticker.actions';
             <input type="text" placeholder="Stocks to Hold" [(ngModel)]="stockPool">
             <span> and a action point of</span>
             <input type="text" placeholder="Decimal Percentage" [(ngModel)]="actionPoint">
-            <button class="btn btn-primary" (click)="analyzeStock()">Analyze</button>
+            <button class="btn btn-primary" (click)="analyzeStock()">Go!</button>
             <span *ngIf="isLoading">Loading...</span>
             <span *ngIf="status === 'Not Found'">Not Found</span>
           </footer>
