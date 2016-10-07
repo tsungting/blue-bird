@@ -71,11 +71,12 @@ export class TickerActions {
       });
   }
 
-  public analyzeMultiStock(page = '1', actionPoint = 0.01, stockPool = 3) {
+  public analyzeMultiStock(page = '1', actionPoint = 0.01, stockPool = 3, filterPriceIfBiggerThan = '0') {
     this.dispatch({}, TickerActions.WEB_REQUEST_STARTED);
     this.fetchMultiStockHistory(page)
       .subscribe((tickerPrices: Array<any>) => {
-        let results = tickerPrices.map((singleTickerPrices) => {
+        let newPrices = tickerPrices.filter((price) => this.filterPrice(price, filterPriceIfBiggerThan));
+        let results = newPrices.map((singleTickerPrices) => {
           return this.analyzeSingleStock(singleTickerPrices, new AlgorithmParameters('N/A', stockPool, actionPoint));
         })
           .filter((result) => result);
@@ -90,6 +91,19 @@ export class TickerActions {
         averagedResults.queryInfo = new AlgorithmParameters('N/A', stockPool, actionPoint, page);
         this.dispatch(averagedResults, TickerActions.MULTI_STOCK_ANALYSIS_RESULT_CREATED);
       });
+  }
+
+  private filterPrice(tickerPrices, threshold) {
+    let minMax = tickerPrices.reduce((currentMinMax, tickerPrice) => {
+      if (tickerPrice < currentMinMax.min) {
+        return {min: tickerPrice, max: currentMinMax.max};
+      }
+      if (tickerPrice > currentMinMax.max) {
+        return {min: currentMinMax.min, max: tickerPrice};
+      }
+      return currentMinMax;
+    }, {min: 999, max: 0});
+    return minMax.min / minMax.max < (1 - threshold);
   }
 
   // Doing this optimization changes load from 16s to 10s
@@ -113,8 +127,8 @@ export class TickerActions {
     }
     let generator = new WebTickerEvolutionGenerator(queryInfo.actionPoint.toString(), queryInfo.pool.toString());
     let evolutions = prices.reduce((currentEvolutions, ticker) => {
-      let newEvolution = generator.getEvolution(ticker, currentEvolutions);
-      return currentEvolutions.concat(JSON.parse(JSON.stringify(newEvolution)));
+      let newEvolution = generator.getEvolution(ticker, JSON.parse(JSON.stringify(currentEvolutions)));
+      return currentEvolutions.concat(newEvolution);
     }, []);
     let result: AnalysisResult = this.analyzeEvolutions(evolutions);
     result.queryInfo = queryInfo;

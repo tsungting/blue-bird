@@ -33,18 +33,6 @@ export class WebTickerEvolutionGenerator {
     return !referenceEvolution;
   }
 
-  private makeResetGoalEvolution(price, evolution) {
-    let newGoals = evolution.goals.map((goal: Goal) => {
-      goal.status = 'deleted';
-      return goal;
-    });
-    return new Evolution(price, newGoals, evolution.ownedStocks, evolution.cashflow, evolution.actionPointUp, evolution.actionPointDown);
-  }
-
-  private shouldStartOver(price, referenceEvolution) {
-    return referenceEvolution.ownedStocks.length === 0;
-  }
-
   private getReferenceEvolution(evolutions) {
     let referenceEvolution = evolutions[evolutions.length - 1];
     if (referenceEvolution) {
