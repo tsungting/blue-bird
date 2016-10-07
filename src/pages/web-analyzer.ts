@@ -16,7 +16,7 @@ import {TickerActions} from '../actions/ticker.actions';
       <div class="col col-12 center">
         <div>
           <div style="max-height:75vh; overflow:scroll">
-            <h2 class="caps">Simulate</h2>
+            <h2 class="caps">Analyze a Year of Data</h2>
 
             <div *ngFor="let result of results">
               <div class="overflow-hidden border rounded m2">

@@ -10,12 +10,12 @@ import {TickerActions} from '../actions/ticker.actions';
 
 @Component({
   selector: 'bb-web-simulation-page',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
   template: `
      <rio-container [size]=4 [center]=true>
       <div class="col col-12 center">
         <div>
-          <h2 class="caps">Simulate</h2>
+          <h2 class="caps">Stock for a Year</h2>
           <span>Run simulation for </span>
           <input type="text" placeholder="Symbol" [(ngModel)]="symbol">
           <span> with a stock pool of </span>
@@ -26,7 +26,6 @@ import {TickerActions} from '../actions/ticker.actions';
         <button class="btn btn-primary" (click)="startWebTicker()">Start</button>
         <span *ngIf="isLoading">Loading...</span>
       </div>
-      <bb-label title="Current Ticker" [content]="ticker$ | async"></bb-label>
 
       <bb-evolution-log
         [evolutions]="evolutions"
@@ -35,7 +34,6 @@ import {TickerActions} from '../actions/ticker.actions';
   `
 })
 export class WebSimulationPage {
-  @select(state => state.ticker.get('currentTicker')) private ticker$;
   @select(state => state.ticker.get('webEvolutions')) private evolutions$;
   @select(state => state.ticker.get('webApiStatus')) private webApiStatus$;
 
