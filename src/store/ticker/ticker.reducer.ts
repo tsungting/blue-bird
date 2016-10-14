@@ -33,6 +33,7 @@ export function tickerReducer(state = INITIAL_STATE,
       state = state.set('webApiStatus', 'Success');
       return state.update('multiStockAnalysisResult', (results) => results.push(action.payload));
     case TickerActions.WEB_REQUEST_STARTED:
+      state = state.set('webEvolutions', Immutable.fromJS([]));
       return state.set('webApiStatus', 'Loading');
     case TickerActions.NOT_FOUND_RECEIVED:
       return state.set('webApiStatus', 'Not Found');
