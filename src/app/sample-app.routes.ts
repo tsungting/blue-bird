@@ -3,6 +3,7 @@ import {DashboardPage} from '../pages/dashboard.page';
 import {WebSimulationPage} from '../pages/web-simulation';
 import {WebAnalyzerPage} from '../pages/web-analyzer';
 import {MultiStockAnalyzer} from '../pages/multi-stock-analyzer';
+import {NTierSimulationPage} from '../pages/n-tier-simulation';
 
 import {
   RioCounterPage,
@@ -31,4 +32,7 @@ export const SAMPLE_APP_ROUTES: Routes = [{
 }, {
   path: 'multi-stock-analyzer',
   component: MultiStockAnalyzer
+}, {
+  path: 'n-tier-simulation',
+  component: NTierSimulationPage
 }];

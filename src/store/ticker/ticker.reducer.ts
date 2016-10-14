@@ -37,6 +37,10 @@ export function tickerReducer(state = INITIAL_STATE,
       return state.set('webApiStatus', 'Loading');
     case TickerActions.NOT_FOUND_RECEIVED:
       return state.set('webApiStatus', 'Not Found');
+    case TickerActions.N_TIER_TREE_RESULTS_CREATED:
+          return state.set('nTierTreeResults', action.payload);
+    case TickerActions.N_TIER_TREE_AVERAGE_CREATED:
+          return state.set('nTierTreeAverage', action.payload);
     default:
       return state;
   }

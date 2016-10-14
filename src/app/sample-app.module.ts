@@ -24,8 +24,9 @@ import {
   RioAboutPage,
   RioCounterPage,
 } from '../pages';
-import {DashboardPage} from '../pages/dashboard.page';
 import {WebSimulationPage} from '../pages/web-simulation';
+import {DashboardPage} from '../pages/dashboard.page';
+import {NTierSimulationPage} from '../pages/n-tier-simulation';
 import {WebAnalyzerPage} from '../pages/web-analyzer';
 import {MultiStockAnalyzer} from '../pages/multi-stock-analyzer';
 import {RioCounter} from '../components/counter/counter.component';
@@ -49,6 +50,7 @@ import {RioNavigatorModule} from '../components/navigator/navigator.module';
     RioAboutPage,
     RioCounterPage,
     DashboardPage,
+    NTierSimulationPage,
     WebSimulationPage,
     WebAnalyzerPage,
     MultiStockAnalyzer,

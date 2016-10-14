@@ -16,6 +16,22 @@ export class TickerApi {
   constructor(private http: Http) {
   }
 
+  public fetchPricesForLevels(levels: number, currentPath = [100]) {
+    let tree = [];
+    this.addLevelsToTree(levels, currentPath, tree);
+    return tree;
+  }
+
+  private addLevelsToTree(levels: number, currentPath = [100], tree = []) {
+    if (levels > 0) {
+      let currentPrice = currentPath[currentPath.length - 1];
+      this.addLevelsToTree(levels - 1, currentPath.concat(currentPrice - 1), tree);
+      this.addLevelsToTree(levels - 1, currentPath.concat(currentPrice + 1), tree);
+      return;
+    }
+    tree.push(currentPath);
+  }
+
   public fetchNextRandomPrice(previousPrice) {
     return Rx.Observable.from([1])
       .map((response) => this.transformTicker(previousPrice));

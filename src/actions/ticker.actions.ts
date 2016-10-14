@@ -7,6 +7,7 @@ import {Evolution} from '../types/evolution';
 import {AlgorithmParameters} from '../types/algorithm-parameters';
 import {AnalysisAggregate} from '../types/analysis-aggregate';
 import {AnalysisResult} from '../types/analysis-result';
+import {NTierTreeResult} from '../types/n-tier-tree-result';
 
 import {RandomTickerEvolutionGenerator} from '../services/random-ticker-evolution-generator';
 import {WebTickerEvolutionGenerator} from '../services/web-ticker-evolution-generator';
@@ -21,6 +22,8 @@ export class TickerActions {
   static NOT_FOUND_RECEIVED = 'NOT_FOUND_RECEIVED';
   static MULTI_STOCK_ANALYSIS_RESULT_CREATED = 'MULTI_STOCK_ANALYSIS_RESULT_CREATED';
   static NEW_STOCK_LIST_CREATED = 'NEW_STOCK_LIST_CREATED';
+  static N_TIER_TREE_RESULTS_CREATED = 'N_TIER_TREE_RESULTS_CREATED';
+  static N_TIER_TREE_AVERAGE_CREATED = 'N_TIER_TREE_AVERAGE_CREATED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
               private tickerApi: TickerApi) {
@@ -70,27 +73,42 @@ export class TickerActions {
         }
       });
   }
+  public analyzeNTierTree(treeDepth = 10, actionPoint = 0.001, stockPool = 3) {
+    let generatedPriceGroup = this.tickerApi.fetchPricesForLevels(treeDepth);
+    let results = generatedPriceGroup.map((singleTickerPrices) => {
+      let analysisResult = this.analyzeSingleStock(singleTickerPrices, new AlgorithmParameters('N/A', stockPool, actionPoint));
+      return new NTierTreeResult(analysisResult, singleTickerPrices);
+    }).filter((result) => result);
+    this.dispatch(results, TickerActions.N_TIER_TREE_RESULTS_CREATED);
+    let averagedResults = this.getAnalysisAggregate(results.map((result) => result.analysisResult));
+    averagedResults.queryInfo = new AlgorithmParameters('N/A', stockPool, actionPoint);
+    this.dispatch(averagedResults, TickerActions.N_TIER_TREE_AVERAGE_CREATED);
+  }
 
   public analyzeMultiStock(page = '1', actionPoint = 0.01, stockPool = 3, filterPriceIfBiggerThan = '0') {
     this.dispatch({}, TickerActions.WEB_REQUEST_STARTED);
     this.fetchMultiStockHistory(page)
-      .subscribe((tickerPrices: Array<any>) => {
-        let newPrices = tickerPrices.filter((price) => this.filterPrice(price, filterPriceIfBiggerThan));
-        let results = newPrices.map((singleTickerPrices) => {
+      .subscribe((tickerPriceGroup: Array<any>) => {
+        let newPriceGroup = tickerPriceGroup.filter((price) => this.filterPrice(price, filterPriceIfBiggerThan));
+        let results = newPriceGroup.map((singleTickerPrices) => {
           return this.analyzeSingleStock(singleTickerPrices, new AlgorithmParameters('N/A', stockPool, actionPoint));
-        })
-          .filter((result) => result);
-        let averagedResults = results.reduce((currentAverage: AnalysisAggregate, result: AnalysisResult) => {
-          currentAverage.averageStockHeld += result.averageStockHeld / results.length;
-          currentAverage.referenceGain += result.referenceGain / results.length;
-          currentAverage.percentageGain += result.percentageGain / results.length;
-          currentAverage.totalStocksAnalyzed += 1;
-          currentAverage.totalWinOverReference += result.percentageGain > result.referenceGain ? 1 : 0;
-          return currentAverage;
-        }, new AnalysisAggregate());
+        }).filter((result) => result);
+
+        let averagedResults = this.getAnalysisAggregate(results);
         averagedResults.queryInfo = new AlgorithmParameters('N/A', stockPool, actionPoint, page);
         this.dispatch(averagedResults, TickerActions.MULTI_STOCK_ANALYSIS_RESULT_CREATED);
       });
+  }
+
+  private getAnalysisAggregate(results: Array<AnalysisResult>) {
+    return results.reduce((currentAverage: AnalysisAggregate, result: AnalysisResult) => {
+      currentAverage.averageStockHeld += result.averageStockHeld / results.length;
+      currentAverage.referenceGain += result.referenceGain / results.length;
+      currentAverage.percentageGain += result.percentageGain / results.length;
+      currentAverage.totalStocksAnalyzed += 1;
+      currentAverage.totalWinOverReference += result.percentageGain > result.referenceGain ? 1 : 0;
+      return currentAverage;
+    }, new AnalysisAggregate());
   }
 
   private filterPrice(tickerPrices, threshold) {
@@ -106,7 +124,7 @@ export class TickerActions {
     return minMax.min / minMax.max < (1 - threshold);
   }
 
-  // Doing this optimization changes load from 16s to 10s
+  // Saving previously loaded list of stocks changes load from 16s to 10s
   private fetchMultiStockHistory(page = '1') {
     let state = this.ngRedux.getState();
     let stockListInStore = state.ticker.getIn(['stockList', page]);
@@ -125,14 +143,18 @@ export class TickerActions {
     if (!prices.length) {
       return;
     }
-    let generator = new WebTickerEvolutionGenerator(queryInfo.actionPoint.toString(), queryInfo.pool.toString());
-    let evolutions = prices.reduce((currentEvolutions, ticker) => {
-      let newEvolution = generator.getEvolution(ticker, JSON.parse(JSON.stringify(currentEvolutions)));
-      return currentEvolutions.concat(newEvolution);
-    }, []);
+    let evolutions = this.getEvolutions(prices, queryInfo);
     let result: AnalysisResult = this.analyzeEvolutions(evolutions);
     result.queryInfo = queryInfo;
     return result;
+  }
+
+  private getEvolutions(prices, queryInfo: AlgorithmParameters) {
+    let generator = new WebTickerEvolutionGenerator(queryInfo.actionPoint.toString(), queryInfo.pool.toString());
+    return prices.reduce((currentEvolutions, price) => {
+      let newEvolution = generator.getEvolution(price, JSON.parse(JSON.stringify(currentEvolutions)));
+      return currentEvolutions.concat(newEvolution);
+    }, []);
   }
 
   private getQueryInfo(symbol, actionPoint, stockPool) {
