@@ -170,9 +170,6 @@ export class WebTickerEvolutionGenerator {
     if (this.isGoalSellButNoStock(completableGoal.isBuy, evolution.ownedStocks)) {
       return false;
     }
-    if (this.isGoalBuyButTooManyStocks(completableGoal.isBuy, evolution.ownedStocks)) {
-      return false;
-    }
     return true;
   }
 

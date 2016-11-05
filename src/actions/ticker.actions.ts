@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { NgRedux } from 'ng2-redux';
 import { IAppState } from '../store';
-import {TickerApi} from '../services/ticker-api';
-import {Goal} from '../types/goal';
-import {Evolution} from '../types/evolution';
-import {AlgorithmParameters} from '../types/algorithm-parameters';
-import {AnalysisAggregate} from '../types/analysis-aggregate';
-import {AnalysisResult} from '../types/analysis-result';
-import {NTierTreeResult} from '../types/n-tier-tree-result';
+import { TickerApi } from '../services/ticker-api';
+import { Goal } from '../types/goal';
+import { Evolution } from '../types/evolution';
+import { AlgorithmParameters } from '../types/algorithm-parameters';
+import { AnalysisAggregate } from '../types/analysis-aggregate';
+import { AnalysisResult } from '../types/analysis-result';
+import { NTierTreeResult } from '../types/n-tier-tree-result';
 
-import {RandomTickerEvolutionGenerator} from '../services/random-ticker-evolution-generator';
-import {WebTickerEvolutionGenerator} from '../services/web-ticker-evolution-generator';
+import { RandomTickerEvolutionGenerator } from '../services/random-ticker-evolution-generator';
+import { WebTickerEvolutionGenerator } from '../services/web-ticker-evolution-generator';
 
 @Injectable()
 export class TickerActions {
@@ -26,7 +26,7 @@ export class TickerActions {
   static N_TIER_TREE_AVERAGE_CREATED = 'N_TIER_TREE_AVERAGE_CREATED';
 
   constructor(private ngRedux: NgRedux<IAppState>,
-              private tickerApi: TickerApi) {
+    private tickerApi: TickerApi) {
   }
 
   public getTickerValue() {
@@ -46,7 +46,7 @@ export class TickerActions {
   public getWebEvolutions(symbol = 'FB', actionPoint = '0.05', stockPool = '3') {
     this.ngRedux.dispatch({
       type: TickerActions.WEB_REQUEST_STARTED,
-      payload: {symbol: symbol}
+      payload: { symbol: symbol }
     });
     this.tickerApi.fetchHistoryFor(symbol)
       .subscribe((ticker) => {
@@ -61,7 +61,7 @@ export class TickerActions {
   }
 
   public analyzeStock(symbol = 'FB', actionPoint = '0.05', stockPool = '3') {
-    this.dispatch({symbol: symbol}, TickerActions.WEB_REQUEST_STARTED);
+    this.dispatch({ symbol: symbol }, TickerActions.WEB_REQUEST_STARTED);
     this.tickerApi.fetchFullHistoryFor(symbol)
       .subscribe((tickers) => {
         let queryInfo = this.getQueryInfo(symbol, actionPoint, stockPool);
@@ -114,13 +114,13 @@ export class TickerActions {
   private filterPrice(tickerPrices, threshold) {
     let minMax = tickerPrices.reduce((currentMinMax, tickerPrice) => {
       if (tickerPrice < currentMinMax.min) {
-        return {min: tickerPrice, max: currentMinMax.max};
+        return { min: tickerPrice, max: currentMinMax.max };
       }
       if (tickerPrice > currentMinMax.max) {
-        return {min: currentMinMax.min, max: tickerPrice};
+        return { min: currentMinMax.min, max: tickerPrice };
       }
       return currentMinMax;
-    }, {min: 999, max: 0});
+    }, { min: 999, max: 0 });
     return minMax.min / minMax.max < (1 - threshold);
   }
 
@@ -131,7 +131,7 @@ export class TickerActions {
     if (!stockListInStore) {
       return this.tickerApi.fetchStockList(page)
         .flatMap((list) => {
-          this.dispatch({page: page, list: list}, TickerActions.NEW_STOCK_LIST_CREATED);
+          this.dispatch({ page: page, list: list }, TickerActions.NEW_STOCK_LIST_CREATED);
           return this.tickerApi.fetchStockForSymbols(list);
         });
     }
