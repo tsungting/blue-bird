@@ -127,7 +127,7 @@ export class WebTickerEvolutionGenerator {
         goalToDelete.status = 'deleted';
         return goalToDelete;
       });
-      return new Evolution(price, deletedGoals, remainingStocks, remainingCashflow, price, price);
+      return new Evolution(price, deletedGoals, remainingStocks, remainingCashflow, actionUp, actionDown);
     }
     return new Evolution(price, remainingGoals, remainingStocks, remainingCashflow, actionUp, actionDown);
   }
